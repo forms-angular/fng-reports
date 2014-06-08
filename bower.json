@@ -1,0 +1,25 @@
+{
+  "name": "fng-reports",
+  "version": "0.4.0-alpha.1",
+  "authors": [
+    "Mark Chapman <mark.chapman@gmail.com>"
+  ],
+  "description": "Angular UI reporting plugin for forms-angular",
+  "main": ["./dist/fng-reports.js","../ng-grid/ng-grid.css"],
+  "keywords": [
+    "forms-angular"
+  ],
+  "license": "MIT",
+  "homepage": "www.forms-angular.org",
+  "dependencies": {
+    "ng-grid": "2.0.7",
+    "jspdf": "1.0.115"
+  },
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
