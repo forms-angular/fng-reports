@@ -5,7 +5,9 @@
     "Mark Chapman <mark.chapman@gmail.com>"
   ],
   "description": "Angular UI reporting plugin for forms-angular",
-  "main": ["./dist/fng-reports.js","../ng-grid/ng-grid.css"],
+  "main": [
+    "./dist/fng-reports.js"
+  ],
   "keywords": [
     "forms-angular"
   ],
