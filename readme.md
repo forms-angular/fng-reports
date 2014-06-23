@@ -1,27 +1,18 @@
-# fng-ui-date
+# fng-reports
 
-Plugin for forms-angular that adds jQuery UI date picker.
+Plugin for forms-angular that adds Reporting capability, with grid output, totals, drill-downs 
+(to other, more specific, reports or to the form that the data can be amended in), export to PDF and CSV
 
 ## Usage
 
-    bower install fng-ui-date
+    bower install fng-reports
     
 Add the following lines to your index.html (or equivalent) file
 
-    <link rel="stylesheet" href="/bower_components/jquery-ui/themes/smoothness/jquery-ui.css">
-    <script src="bower_components/angular-ui-date/src/date.js"></script>
+    <link rel="stylesheet" href="/bower_components/ng-grid/ng-grid.css" />
     
-Date fields in models will have the date picker added.
+    <script src="bower_components/ng-grid/build/ng-grid.min.js"></script>
+    <script src="bower_components/jspdf/dist/jspdf.min.js"></script>
+    <script src="bower_components/fng-reports/dist/fng-reports.js"></script>
     
-## Configuration
-
-Configure as part of your Angular app configuration as follows:
-
-```myApp.config(['uiDateConfig', function(uiDateConfig) {
-    angular.extend(uiDateConfig, {
-        dateFormat: 'dd/mm/yy',             // UK date format
-        firstDay: 1                         // Monday week start
-    });
-```    
-
-For detailed options see the documentation at http://jqueryui.com/datepicker/
+The full documentation, which includes examples, is at www.forms-angular.org/#/plugins 
