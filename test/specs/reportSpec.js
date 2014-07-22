@@ -25,11 +25,13 @@ describe('Reports', function () {
           {'_id': 'M', 'count': 6}
         ]});
         var scope = $rootScope.$new();
-        var routingService = {parsePathFunc: function () {
-          return function  () {
-            return {modelName: 'collection', reportSchemaName: 'myReport'}
-          };
-        }}
+        var routingService = {
+          parsePathFunc: function () {
+            return function  () {
+              return {modelName: 'collection', reportSchemaName: 'myReport'}
+            };
+          }
+        };
         $controller('AnalysisCtrl', {$scope: scope, routingService: routingService});
         $httpBackend.flush();
         expect(scope.report.length).toBe(2);
