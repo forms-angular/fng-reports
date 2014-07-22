@@ -7,8 +7,6 @@ formsAngular.directive('ngTotalCell', ['$compile', '$domUtilityService', functio
       return {
         pre: function ($scope, iElement) {
           var html;
-// ellText" ng-class="col.colIndex()"><span ng-cell-text>{{COL_FIELD |number}}</s
-// ellText" ng-class="col.colIndex()"><span ng-cell-text>{{COL_FIELD }}</s
           var cellTemplate,
             filterMatch = $scope.col.cellTemplate.match(/{{COL_FIELD \|(.+)}}/);
           if (filterMatch) {

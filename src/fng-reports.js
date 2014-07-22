@@ -1,14 +1,14 @@
 'use strict';
 
-formsAngular.controller('AnalysisCtrl', ['$locationParse', '$filter', '$scope', '$http', '$location', '$routeParams', 'urlService',
-  function ($locationParse, $filter, $scope, $http, $location, $routeParams, urlService) {
+formsAngular.controller('AnalysisCtrl', ['$filter', '$scope', '$http', '$location', 'routingService',
+  function ($filter, $scope, $http, $location, routingService) {
     /*jshint newcap: false */
     var firstTime = true,
       pdfPlugIn = new ngGridPdfExportPlugin({inhibitButton: true}),
       csvPlugIn = new ngGridCsvExportPlugin({inhibitButton: true});
     /*jshint newcap: true */
 
-    angular.extend($scope, $routeParams);
+    angular.extend($scope, routingService.parsePathFunc()($location.$$path));
     $scope.reportSchema = {};
     $scope.gridOptions = {
       columnDefs: 'reportSchema.columnDefs',
@@ -27,7 +27,7 @@ formsAngular.controller('AnalysisCtrl', ['$locationParse', '$filter', '$scope', 
       afterSelectionChange: function (rowItem) {
         var url = $scope.reportSchema.drilldown;
         if (url) {
-          url = urlService.buildUrl(url.replace(/\|.+?\|/g, function (match) {
+          url = routingService.buildUrl(url.replace(/\|.+?\|/g, function (match) {
             var param = match.slice(1, -1),
               isParamTest = /\((.+)\)/.exec(param);
             return isParamTest ? $scope.reportSchema.params[isParamTest[1]].value : rowItem.entity[param];
@@ -75,13 +75,13 @@ formsAngular.controller('AnalysisCtrl', ['$locationParse', '$filter', '$scope', 
     };
     $scope.report = [];
 
-    if (!$scope.reportSchemaName && $routeParams.r) {
-      switch ($routeParams.r.slice(0, 1)) {
+    if (!$scope.reportSchemaName && $location.$$search.r) {
+      switch ($location.$$search.r.slice(0, 1)) {
         case '[' :
-          $scope.reportSchema.pipeline = JSON.parse($routeParams.r);
+          $scope.reportSchema.pipeline = JSON.parse($location.$$search.r);
           break;
         case '{' :
-          angular.extend($scope.reportSchema, JSON.parse($routeParams.r));
+          angular.extend($scope.reportSchema, JSON.parse($location.$$search.r));
           break;
         default :
           throw new Error('No report instructions specified');
@@ -127,7 +127,7 @@ formsAngular.controller('AnalysisCtrl', ['$locationParse', '$filter', '$scope', 
 
     $scope.refreshQuery = function () {
 
-      var apiCall = '/api/report/' + $scope.model,
+      var apiCall = '/api/report/' + $scope.modelName,
         connector = '?';
       if ($scope.reportSchemaName) {
         apiCall += '/' + $scope.reportSchemaName;
@@ -162,7 +162,7 @@ formsAngular.controller('AnalysisCtrl', ['$locationParse', '$filter', '$scope', 
         if (data.success) {
           $scope.report = data.report;
           $scope.reportSchema = data.schema;
-          $scope.reportSchema.title = $scope.reportSchema.title || $scope.model;
+          $scope.reportSchema.title = $scope.reportSchema.title || $scope.modelName;
 
           if (firstTime) {
             firstTime = false;

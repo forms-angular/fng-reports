@@ -1,15 +1,15 @@
-/*! forms-angular 2014-06-10 */
+/*! forms-angular 2014-07-22 */
 'use strict';
 
-formsAngular.controller('AnalysisCtrl', ['$locationParse', '$filter', '$scope', '$http', '$location', '$routeParams', 'urlService',
-  function ($locationParse, $filter, $scope, $http, $location, $routeParams, urlService) {
+formsAngular.controller('AnalysisCtrl', ['$filter', '$scope', '$http', '$location', 'routingService',
+  function ($filter, $scope, $http, $location, routingService) {
     /*jshint newcap: false */
     var firstTime = true,
       pdfPlugIn = new ngGridPdfExportPlugin({inhibitButton: true}),
       csvPlugIn = new ngGridCsvExportPlugin({inhibitButton: true});
     /*jshint newcap: true */
 
-    angular.extend($scope, $routeParams);
+    angular.extend($scope, routingService.parsePathFunc()($location.$$path));
     $scope.reportSchema = {};
     $scope.gridOptions = {
       columnDefs: 'reportSchema.columnDefs',
@@ -28,7 +28,7 @@ formsAngular.controller('AnalysisCtrl', ['$locationParse', '$filter', '$scope', 
       afterSelectionChange: function (rowItem) {
         var url = $scope.reportSchema.drilldown;
         if (url) {
-          url = urlService.buildUrl(url.replace(/\|.+?\|/g, function (match) {
+          url = routingService.buildUrl(url.replace(/\|.+?\|/g, function (match) {
             var param = match.slice(1, -1),
               isParamTest = /\((.+)\)/.exec(param);
             return isParamTest ? $scope.reportSchema.params[isParamTest[1]].value : rowItem.entity[param];
@@ -76,13 +76,13 @@ formsAngular.controller('AnalysisCtrl', ['$locationParse', '$filter', '$scope', 
     };
     $scope.report = [];
 
-    if (!$scope.reportSchemaName && $routeParams.r) {
-      switch ($routeParams.r.slice(0, 1)) {
+    if (!$scope.reportSchemaName && $location.$$search.r) {
+      switch ($location.$$search.r.slice(0, 1)) {
         case '[' :
-          $scope.reportSchema.pipeline = JSON.parse($routeParams.r);
+          $scope.reportSchema.pipeline = JSON.parse($location.$$search.r);
           break;
         case '{' :
-          angular.extend($scope.reportSchema, JSON.parse($routeParams.r));
+          angular.extend($scope.reportSchema, JSON.parse($location.$$search.r));
           break;
         default :
           throw new Error('No report instructions specified');
@@ -128,7 +128,7 @@ formsAngular.controller('AnalysisCtrl', ['$locationParse', '$filter', '$scope', 
 
     $scope.refreshQuery = function () {
 
-      var apiCall = '/api/report/' + $scope.model,
+      var apiCall = '/api/report/' + $scope.modelName,
         connector = '?';
       if ($scope.reportSchemaName) {
         apiCall += '/' + $scope.reportSchemaName;
@@ -163,7 +163,7 @@ formsAngular.controller('AnalysisCtrl', ['$locationParse', '$filter', '$scope', 
         if (data.success) {
           $scope.report = data.report;
           $scope.reportSchema = data.schema;
-          $scope.reportSchema.title = $scope.reportSchema.title || $scope.model;
+          $scope.reportSchema.title = $scope.reportSchema.title || $scope.modelName;
 
           if (firstTime) {
             firstTime = false;
@@ -242,6 +242,60 @@ formsAngular.controller('AnalysisCtrl', ['$locationParse', '$filter', '$scope', 
 
   }]);
 
+
+
+
+'use strict';
+var COL_FIELD = /COL_FIELD/g;
+formsAngular.directive('ngTotalCell', ['$compile', '$domUtilityService', function ($compile, domUtilityService) {
+  var ngTotalCell = {
+    scope: false,
+    compile: function () {
+      return {
+        pre: function ($scope, iElement) {
+          var html;
+// ellText" ng-class="col.colIndex()"><span ng-cell-text>{{COL_FIELD |number}}</s
+// ellText" ng-class="col.colIndex()"><span ng-cell-text>{{COL_FIELD }}</s
+          var cellTemplate,
+            filterMatch = $scope.col.cellTemplate.match(/{{COL_FIELD \|(.+)}}/);
+          if (filterMatch) {
+            cellTemplate = $scope.col.cellTemplate.replace('COL_FIELD |' + filterMatch[1], 'getTotalVal("' + $scope.col.field + '","' + filterMatch[1] + '")');
+          } else {
+            cellTemplate = $scope.col.cellTemplate.replace(COL_FIELD, 'getTotalVal("' + $scope.col.field + '")');
+          }
+
+          if ($scope.col.enableCellEdit) {
+            html = $scope.col.cellEditTemplate;
+            html = html.replace(DISPLAY_CELL_TEMPLATE, cellTemplate);
+            html = html.replace(EDITABLE_CELL_TEMPLATE, $scope.col.editableCellTemplate.replace(COL_FIELD, 'row.entity.' + $scope.col.field));
+          } else {
+            html = cellTemplate;
+          }
+
+          var cellElement = $compile(html)($scope);
+
+          if ($scope.enableCellSelection && cellElement[0].className.indexOf('ngSelectionCell') === -1) {
+            cellElement[0].setAttribute('tabindex', 0);
+            cellElement.addClass('ngCellElement');
+          }
+
+          iElement.append(cellElement);
+        },
+        post: function ($scope, iElement) {
+          if ($scope.enableCellSelection) {
+            $scope.domAccessProvider.selectionHandlers($scope, iElement);
+          }
+
+          $scope.$on('ngGridEventDigestCell', function () {
+            domUtilityService.digest($scope);
+          });
+        }
+      };
+    }
+  };
+
+  return ngTotalCell;
+}]);
 
 
 
@@ -725,9 +779,9 @@ function ngGridPdfExportPlugin(options) {
     }
 
     // -- Construct the table
-    var lineHeight;
+
     if (printHeaders) {
-      lineHeight = this.calculateLineHeight(headerNames, columnWidths, headerPrompts.length ? headerPrompts : headerNames);
+      var lineHeight = this.calculateLineHeight(headerNames, columnWidths, headerPrompts.length ? headerPrompts : headerNames);
 
       // Construct the header row
       for (i = 0, ln = headerNames.length; i < ln; i += 1) {
@@ -744,6 +798,7 @@ function ngGridPdfExportPlugin(options) {
 
     // Construct the data rows
     for (i = 0, ln = data.length; i < ln; i += 1) {
+      var lineHeight;
       model = data[i];
       lineHeight = this.calculateLineHeight(headerNames, columnWidths, model);
 

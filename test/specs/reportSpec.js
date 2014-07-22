@@ -1,7 +1,5 @@
 'use strict';
 
-//TODO: Get this test plumbed in
-
 // TODO: Test that ngGridTotalCell stuff works now it has been moved into plugin
 
 describe('Reports', function () {
@@ -26,13 +24,18 @@ describe('Reports', function () {
           {'_id': 'F', 'count': 11},
           {'_id': 'M', 'count': 6}
         ]});
-        var routeParams = {model: 'collection', reportSchemaName: 'myReport'};
         var scope = $rootScope.$new();
-        $controller('AnalysisCtrl', {$scope: scope, $routeParams: routeParams});
+        var routingService = {parsePathFunc: function () {
+          return function  () {
+            return {modelName: 'collection', reportSchemaName: 'myReport'}
+          };
+        }}
+        $controller('AnalysisCtrl', {$scope: scope, routingService: routingService});
         $httpBackend.flush();
         expect(scope.report.length).toBe(2);
       });
     });
 
   });
+
 });
