@@ -1,4 +1,4 @@
-/*! forms-angular 2014-07-22 */
+/*! forms-angular 2014-08-23 */
 'use strict';
 
 formsAngular.controller('AnalysisCtrl', ['$filter', '$scope', '$http', '$location', 'routingService',
@@ -254,8 +254,6 @@ formsAngular.directive('ngTotalCell', ['$compile', '$domUtilityService', functio
       return {
         pre: function ($scope, iElement) {
           var html;
-// ellText" ng-class="col.colIndex()"><span ng-cell-text>{{COL_FIELD |number}}</s
-// ellText" ng-class="col.colIndex()"><span ng-cell-text>{{COL_FIELD }}</s
           var cellTemplate,
             filterMatch = $scope.col.cellTemplate.match(/{{COL_FIELD \|(.+)}}/);
           if (filterMatch) {
