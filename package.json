@@ -1,6 +1,6 @@
 {
   "name": "fng-reports",
-  "version": "0.4.0-alpha.3",
+  "version": "0.4.0-beta.1",
   "description": "Reporting plugin for forms-angular",
   "repository": {
     "type": "git",
@@ -9,10 +9,13 @@
   "keywords": [
     "forms-angular"
   ],
-  "author": "Mark Chapman",
+  "author": "Mark Chapman <support@forms-angular.org>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/forms-angular/fng-reports/issues"
+  },
+  "peerDependencies": {
+    "forms-angular": "0.4.0-beta.1"
   },
   "devDependencies": {
     "grunt": "~0.4.5",
@@ -27,7 +30,7 @@
     "grunt-contrib-watch": "*",
     "grunt-karma": "^0.8.3",
     "grunt-newer": "^0.7.0",
-    "grunt-ngmin": "*",
+    "grunt-ng-annotate": "*",
     "grunt-rev": "~0.1.0",
     "grunt-usemin": "^2.1.0",
     "karma": "^0.12.17",
