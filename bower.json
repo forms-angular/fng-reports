@@ -1,6 +1,6 @@
 {
   "name": "fng-reports",
-  "version": "0.4.0-beta.1",
+  "version": "0.4.0-beta.2",
   "author": "Mark Chapman <support@forms-angular.org>",
   "description": "Angular UI reporting plugin for forms-angular",
   "main": [
@@ -20,7 +20,7 @@
     "angular": "1.3.0-rc.1",
     "angular-sanitize": "1.3.0-rc.1",
     "angular-mocks": "1.3.0-rc.1",
-    "forms-angular": "0.4.0-beta.1",
+    "forms-angular": "0.4.0-beta.2",
     "angular-ui-bootstrap-bower": ">=0.8.0"
   },
   "ignore": [
@@ -29,9 +29,5 @@
     "bower_components",
     "test",
     "tests"
-  ],
-  "resolutions": {
-    "angular": ">=1.0.6",
-    "angular-sanitize": "1.3.0-rc.1"
-  }
+  ]
 }
