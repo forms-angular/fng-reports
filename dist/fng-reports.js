@@ -1,8 +1,8 @@
-/*! forms-angular 2014-10-14 */
+/*! forms-angular 2015-02-26 */
 'use strict';
 
-formsAngular.controller('AnalysisCtrl', ['$filter', '$scope', '$http', '$location', 'routingService',
-  function ($filter, $scope, $http, $location, routingService) {
+formsAngular.controller('AnalysisCtrl', ['$filter', '$scope', '$http', '$location', 'cssFrameworkService', 'routingService',
+  function ($filter, $scope, $http, $location, cssFrameworkService, routingService) {
     /*jshint newcap: false */
     var firstTime = true,
       pdfPlugIn = new ngGridPdfExportPlugin({inhibitButton: true}),
@@ -10,6 +10,7 @@ formsAngular.controller('AnalysisCtrl', ['$filter', '$scope', '$http', '$locatio
     /*jshint newcap: true */
 
     angular.extend($scope, routingService.parsePathFunc()($location.$$path));
+
     $scope.reportSchema = {};
     $scope.gridOptions = {
       columnDefs: 'reportSchema.columnDefs',
@@ -164,6 +165,11 @@ formsAngular.controller('AnalysisCtrl', ['$filter', '$scope', '$http', '$locatio
           $scope.report = data.report;
           $scope.reportSchema = data.schema;
           $scope.reportSchema.title = $scope.reportSchema.title || $scope.modelName;
+          $scope.reportSchema.title = $scope.reportSchema.title.replace(/\|.+?\|/g, function (match) {
+            var param = match.slice(1, -1);
+            var isParamTest = /\((.+)\)/.exec(param);
+            return isParamTest ? $scope.reportSchema.params[isParamTest[1]].value : '';
+            });
 
           if (firstTime) {
             firstTime = false;
@@ -205,7 +211,7 @@ formsAngular.controller('AnalysisCtrl', ['$filter', '$scope', '$http', '$locatio
                       type: thisPart.type || 'text',
                       required: true,
                       add: thisPart.add || undefined,
-                      size: thisPart.size || 'small'
+                      size: thisPart.size || (cssFrameworkService.frameWork === 'bs3' ? 'large' : 'medium')
                     });
                     if (thisPart.type === 'select') {
                       // TODO: Remove when select and select2 is modified during the restructure
