@@ -1,6 +1,6 @@
 {
   "name": "fng-reports",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": "true",
   "description": "Reporting plugin for forms-angular",
   "repository": {
@@ -8,7 +8,10 @@
     "url": "https://github.com/forms-angular/fng-reports"
   },
   "keywords": [
-    "forms-angular"
+    "forms-angular",
+    "mongoose",
+    "angular",
+    "reporting"
   ],
   "author": "Mark Chapman <support@forms-angular.org>",
   "license": "MIT",
@@ -16,7 +19,7 @@
     "url": "https://github.com/forms-angular/fng-reports/issues"
   },
   "peerDependencies": {
-    "forms-angular": "^0.5.0"
+    "forms-angular": "0.6.0"
   },
   "devDependencies": {
     "grunt": "~0.4.5",
