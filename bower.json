@@ -1,6 +1,6 @@
 {
   "name": "fng-reports",
-  "version": "0.6.0",
+  "version": "0.7.0-beta.1",
   "author": "Mark Chapman <support@forms-angular.org>",
   "description": "Angular UI reporting plugin for forms-angular",
   "main": [
