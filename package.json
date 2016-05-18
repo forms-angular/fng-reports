@@ -1,6 +1,6 @@
 {
   "name": "fng-reports",
-  "version": "0.7.0-beta.1",
+  "version": "0.7.0",
   "private": "true",
   "description": "Reporting plugin for forms-angular",
   "repository": {
@@ -19,7 +19,7 @@
     "url": "https://github.com/forms-angular/fng-reports/issues"
   },
   "peerDependencies": {
-    "forms-angular": "0.7.0-beta.1"
+    "forms-angular": "0.7.0"
   },
   "devDependencies": {
     "grunt": "~0.4.5",
