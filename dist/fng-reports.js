@@ -1,4 +1,4 @@
-/*! forms-angular 2016-05-18 */
+/*! forms-angular 2017-02-06 */
 'use strict';
 
 formsAngular.controller('AnalysisCtrl', ['$filter', '$scope', '$http', '$location', 'cssFrameworkService', 'routingService',
@@ -160,7 +160,8 @@ formsAngular.controller('AnalysisCtrl', ['$filter', '$scope', '$http', '$locatio
           apiCall += connector + query[0].slice(1);
         }
       }
-      $http.get(apiCall).success(function (data) {
+      $http.get(apiCall).then(function (response) {
+        var data = response.data;
         if (data.success) {
           $scope.report = data.report;
           $scope.reportSchema = data.schema;
@@ -238,8 +239,8 @@ formsAngular.controller('AnalysisCtrl', ['$filter', '$scope', '$http', '$locatio
           console.log(JSON.stringify(data));
           $scope.reportSchema.title = 'Error - see console log';
         }
-      }).error(function (err) {
-        console.log(JSON.stringify(err));
+      }, function (response) {
+        console.log(JSON.stringify(response));
         $location.path('/404');
       });
     };
