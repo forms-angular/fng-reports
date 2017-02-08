@@ -10,11 +10,14 @@ formsAngular.controller('AnalysisCtrl', ['$filter', '$scope', '$http', '$locatio
 
     angular.extend($scope, routingService.parsePathFunc()($location.$$path));
 
-    $scope.reportSchema = {};
+    $scope.reportSchema = {
+      columnDefs: []
+    };
     $scope.gridOptions = {
-      columnDefs: 'reportSchema.columnDefs',
       data: 'report',
+      columnDefs: $scope.reportSchema.columnDefs,
       showColumnMenu: true,
+      enableRowHeaderSelection: false,
       showFilter: true,
       showFooter: true,    // always set this to true so it works out the style
       reallyShowFooter: true,   // this determines whether it is actually displayed or not
@@ -25,16 +28,19 @@ formsAngular.controller('AnalysisCtrl', ['$filter', '$scope', '$http', '$locatio
       footerRowHeight: 65,
       multiSelect: false,
       plugins: [pdfPlugIn, csvPlugIn],
-      afterSelectionChange: function (rowItem) {
-        var url = $scope.reportSchema.drilldown;
-        if (url) {
-          url = routingService.buildUrl(url.replace(/\|.+?\|/g, function (match) {
-            var param = match.slice(1, -1),
-              isParamTest = /\((.+)\)/.exec(param);
-            return isParamTest ? $scope.reportSchema.params[isParamTest[1]].value : rowItem.entity[param];
-          }));
-          window.location = url;
-        }
+      onRegisterApi : function (gridApi) {
+          $scope.gridApi = gridApi;
+          gridApi.selection.on.rowSelectionChanged($scope, function afterSelectionChange(rowItem) {
+              var url = $scope.reportSchema.drilldown;
+              if (url) {
+                  url = routingService.buildUrl(url.replace(/\|.+?\|/g, function (match) {
+                      var param = match.slice(1, -1),
+                          isParamTest = /\((.+)\)/.exec(param);
+                      return isParamTest ? $scope.reportSchema.params[isParamTest[1]].value : rowItem.entity[param];
+                  }));
+                  window.location = url;
+              }
+          })
       },
       footerTemplate: '<div ng-show="gridOptions.reallyShowFooter" class="ngFooterPanel" ng-class="{\'ui-widget-content\': jqueryUITheme, \'ui-corner-bottom\': jqueryUITheme}" ' +
         'ng-style="footerStyle()">' +
@@ -189,6 +195,15 @@ formsAngular.controller('AnalysisCtrl', ['$filter', '$scope', '$http', '$locatio
                     }
                   }
                 }
+                // Auto-upgrade from ng-grid to ui-grid
+                newValue.forEach(function(def) {
+                    // Remove px from column widths
+                    if (def.width && typeof def.width === 'string' && def.width.indexOf('px') !== -1) {
+                        def.width = parseInt(def.width.slice(0, -2));
+                    }
+                });
+                console.log(JSON.stringify(newValue,null,2));
+                $scope.gridOptions.columnDefs = newValue;
               }
               $scope.gridOptions.showTotals = columnTotals;
               $scope.gridOptions.reallyShowFooter = columnTotals;
