@@ -9,9 +9,9 @@ Plugin for forms-angular that adds Reporting capability, with grid output, total
     
 Add the following lines to your index.html (or equivalent) file
 
-    <link rel="stylesheet" href="/bower_components/ng-grid/ng-grid.css" />
+    <link rel="stylesheet" href="/bower_components/angular-ui-grid/ui-grid.css" />
     
-    <script src="bower_components/ng-grid/build/ng-grid.min.js"></script>
+    <script src="bower_components/angular-ui-grid/ui-grid.js"></script>
     <script src="bower_components/jspdf/dist/jspdf.min.js"></script>
     <script src="bower_components/fng-reports/dist/fng-reports.js"></script>
     
