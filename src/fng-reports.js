@@ -202,7 +202,6 @@ formsAngular.controller('AnalysisCtrl', ['$filter', '$scope', '$http', '$locatio
                         def.width = parseInt(def.width.slice(0, -2));
                     }
                 });
-                console.log(JSON.stringify(newValue,null,2));
                 $scope.gridOptions.columnDefs = newValue;
               }
               $scope.gridOptions.showTotals = columnTotals;
