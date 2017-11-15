@@ -1,4 +1,4 @@
-/*! forms-angular 2017-02-17 */
+/*! forms-angular 2017-11-15 */
 'use strict';
 
 formsAngular.controller('AnalysisCtrl', ['$filter', '$scope', '$http', '$location', 'cssFrameworkService', 'routingService',
@@ -203,7 +203,6 @@ formsAngular.controller('AnalysisCtrl', ['$filter', '$scope', '$http', '$locatio
                         def.width = parseInt(def.width.slice(0, -2));
                     }
                 });
-                console.log(JSON.stringify(newValue,null,2));
                 $scope.gridOptions.columnDefs = newValue;
               }
               $scope.gridOptions.showTotals = columnTotals;
