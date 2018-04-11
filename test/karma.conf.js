@@ -19,7 +19,19 @@ module.exports = function(config) {
     autoWatch : true,
     usePolling: true,
 
-    browsers : ['PhantomJS'],
+    customLaunchers: {
+      ChromeHeadless: {
+        base: 'Chrome',
+        flags: [
+          '--headless',
+          '--disable-gpu',
+          // Without a remote debugging port, Google Chrome exits immediately.
+          '--remote-debugging-port=9222',
+        ],
+      }
+    },
+
+    browsers : ['ChromeHeadless'],
 
     // use dots reporter, as travis terminal does not support escaping sequences
     // possible values: 'dots', 'progress'
@@ -32,7 +44,7 @@ module.exports = function(config) {
     },
     plugins: [
       'karma-jasmine',
-      'karma-phantomjs-launcher',
+      'karma-chrome-launcher',
       'karma-junit-reporter'
     ]
   });

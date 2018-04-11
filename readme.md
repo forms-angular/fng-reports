@@ -5,14 +5,18 @@ Plugin for forms-angular that adds Reporting capability, with grid output, total
 
 ## Usage
 
-    bower install fng-reports
+    npm install fng-reports
+
+To get all the dependencies at the top level of your node_modules run
+
+    npm dedupe
     
 Add the following lines to your index.html (or equivalent) file
 
-    <link rel="stylesheet" href="/bower_components/angular-ui-grid/ui-grid.css" />
+    <link rel="stylesheet" href="angular-ui-grid/ui-grid.css" />
     
-    <script src="bower_components/angular-ui-grid/ui-grid.js"></script>
-    <script src="bower_components/jspdf/dist/jspdf.min.js"></script>
-    <script src="bower_components/fng-reports/dist/fng-reports.js"></script>
+    <script src="angular-ui-grid/ui-grid.js"></script>
+    <script src="jspdf/dist/jspdf.min.js"></script>
+    <script src="fng-reports/dist/fng-reports.js"></script>
     
 The full documentation, which includes examples, is at www.forms-angular.org/#/plugins 
