@@ -1,6 +1,6 @@
 {
   "name": "fng-reports",
-  "version": "0.12.0-beta.13",
+  "version": "0.12.0-beta.14",
   "description": "Reporting plugin for forms-angular",
   "repository": {
     "type": "git",
@@ -27,7 +27,7 @@
     "angular-messages": "1.7.3",
     "angular-mocks": "1.7.3",
     "angular-sanitize": "1.7.3",
-    "forms-angular": "0.12.0-beta.13",
+    "forms-angular": "0.12.0-beta.14",
     "grunt": "^1.0.3",
     "grunt-autoprefixer": "3.0.4",
     "grunt-concurrent": "2.3.1",
