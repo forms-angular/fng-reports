@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "jquery": "3.3.1",
-    "angular-ui-grid": "4.7.1",
+    "angular-ui-grid": "4.6.6",
     "jspdf": "1.5.3"
   },
   "devDependencies": {
