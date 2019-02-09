@@ -1,4 +1,4 @@
-/*! forms-angular 2019-01-03 */
+/*! forms-angular 2019-02-09 */
 'use strict';
 
 formsAngular.controller('AnalysisCtrl', ['$filter', '$scope', '$http', '$location', 'cssFrameworkService', 'routingService',
