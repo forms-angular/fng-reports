@@ -18,8 +18,8 @@
     "url": "https://github.com/forms-angular/fng-reports/issues"
   },
   "dependencies": {
-    "jquery": "3.4.0",
-    "angular-ui-grid": "4.7.1",
+    "jquery": "3.4.1",
+    "angular-ui-grid": "4.8.0",
     "jspdf": "1.5.3"
   },
   "devDependencies": {
