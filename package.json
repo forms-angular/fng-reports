@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "jquery": "3.4.1",
-    "angular-ui-grid": "4.8.0",
+    "angular-ui-grid": "4.8.1",
     "jspdf": "1.5.3"
   },
   "devDependencies": {
@@ -27,10 +27,10 @@
     "angular-messages": "1.7.8",
     "angular-mocks": "1.7.8",
     "angular-sanitize": "1.7.8",
-    "forms-angular": "^0.12.0-pre",
+    "forms-angular": "^0.12.0-beta.42",
     "grunt": "^1.0.4",
     "grunt-autoprefixer": "3.0.4",
-    "grunt-concurrent": "2.3.1",
+    "grunt-concurrent": "3.0.0",
     "grunt-contrib-clean": "2.0.0",
     "grunt-contrib-concat": "1.0.1",
     "grunt-contrib-copy": "1.0.0",
@@ -43,8 +43,8 @@
     "grunt-rev": "0.1.0",
     "grunt-usemin": "mchapman/grunt-usemin",
     "jasmine-core": "3.4.0",
-    "karma": "^4.1.0",
-    "karma-chrome-launcher": "2.2.0",
+    "karma": "^4.2.0",
+    "karma-chrome-launcher": "3.0.0",
     "karma-jasmine": "2.0.1",
     "karma-junit-reporter": "1.2.0",
     "lodash": "^4.17.14",
