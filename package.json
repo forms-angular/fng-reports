@@ -27,7 +27,7 @@
     "angular-messages": "1.7.8",
     "angular-mocks": "1.7.8",
     "angular-sanitize": "1.7.8",
-    "forms-angular": "0.12.0-beta.41",
+    "forms-angular": "^0.12.0-pre",
     "grunt": "^1.0.4",
     "grunt-autoprefixer": "3.0.4",
     "grunt-concurrent": "2.3.1",
@@ -47,7 +47,7 @@
     "karma-chrome-launcher": "2.2.0",
     "karma-jasmine": "2.0.1",
     "karma-junit-reporter": "1.2.0",
-    "lodash": "4.17.11",
+    "lodash": "^4.17.14",
     "matchdep": "2.0.0",
     "ng-infinite-scroll": "1.3.0"
   }
