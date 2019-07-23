@@ -5,6 +5,10 @@
  but that would require putting the totals (ngGridTotalCell.js) into a plugin.
  */
 
+/**
+ * FOOTER NO LONGER SUPPORTED
+ */
+
 function ngGridPdfExportPlugin(options) {
   var self = this;
   self.grid = null;
@@ -33,33 +37,38 @@ function ngGridPdfExportPlugin(options) {
 
   self.createPDF = function () {
     var headers = [],
-      data = [],
-      footers = {},
-      gridWidth = self.scope.totalRowWidth(),
-      margin = 15;  // mm defined as unit when setting up jsPDF
+        headerNames = [],
+        footers = [],
+        data = [];
 
-    angular.forEach(self.scope.columns, function (col) {
-      if (col.visible && (col.width === undefined || col.width > 0)) {
-        headers.push({name: col.field, prompt: col.displayName, width: col.width * (185 / gridWidth), align: (col.colDef.align || 'left')});
-        if (col.colDef.totalsRow) {
-          footers[col.field] = self.scope.getTotalVal(col.field, col.filter).toString();
-        }
+    angular.forEach(self.grid.columns, function (col) {
+      if (col.visible) {
+        headers.push(col.displayName);
+        headerNames.push(col.field);
+      }
+      if (col.colDef.totalsRow) {
+        footers[col.field] = self.grid.getTotalVal(col.field, col.filter).toString();
       }
     });
 
-    angular.forEach(self.grid.filteredRows, function (row) {
-      data.push(angular.copy(row.entity));
+    angular.forEach(self.grid.rows, function (row) {
+      var output = [];
+      if (row.visible) {
+        headerNames.forEach(function(h) {
+          output.push(row.entity[h]);
+        });
+        data.push(output);
+      }
     });
 
+    // var doc = new jsPDF('landscape', 'mm', 'a4');
     var doc = new jsPDF('landscape', 'mm', 'a4');
-    doc.setFontStyle('bold');
-    doc.setFontSize(24);
-    doc.text(self.scope.reportSchema.title, margin, margin);
-    doc.setFontStyle('normal');
-    doc.setFontSize(12);
-    doc.cellInitialize();
-    doc.table(margin, 24, data, {headers: headers, footers: footers, printHeaders: true, autoSize: false, margins: {left: margin, top: margin, bottom: margin, width: doc.internal.pageSize - margin}});
-    doc.output('dataurlnewwindow');
+    doc.autoTable({
+      head: [headers],
+      body: data
+    });
+
+    window.open(doc.output('bloburl'));
   };
 }
 

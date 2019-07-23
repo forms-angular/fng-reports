@@ -1,7 +1,7 @@
 'use strict';
 
-formsAngular.controller('AnalysisCtrl', ['$filter', '$scope', '$http', '$location', 'cssFrameworkService', 'routingService',
-  function ($filter, $scope, $http, $location, cssFrameworkService, routingService) {
+formsAngular.controller('AnalysisCtrl', ['$rootScope', '$filter', '$scope', '$http', '$location', 'cssFrameworkService', 'routingService',
+  function ($rootScope, $filter, $scope, $http, $location, cssFrameworkService, routingService) {
     /*jshint newcap: false */
     var firstTime = true,
       pdfPlugIn = new ngGridPdfExportPlugin({inhibitButton: true}),
@@ -30,6 +30,7 @@ formsAngular.controller('AnalysisCtrl', ['$filter', '$scope', '$http', '$locatio
       plugins: [pdfPlugIn, csvPlugIn],
       onRegisterApi : function (gridApi) {
           $scope.gridApi = gridApi;
+          $scope.gridOptions.plugins.forEach(function(p) {p.init($scope, gridApi.grid, null); });
           gridApi.selection.on.rowSelectionChanged($scope, function afterSelectionChange(rowItem) {
               var url = $scope.reportSchema.drilldown;
               if (url) {
@@ -165,7 +166,7 @@ formsAngular.controller('AnalysisCtrl', ['$filter', '$scope', '$http', '$locatio
           apiCall += connector + query[0].slice(1);
         }
       }
-      $http.get(apiCall).then(function (response) {
+      return $http.get(apiCall).then(function (response) {
         var data = response.data;
         if (data.success) {
           $scope.report = data.report;
@@ -259,6 +260,18 @@ formsAngular.controller('AnalysisCtrl', ['$filter', '$scope', '$http', '$locatio
     };
 
     $scope.refreshQuery();
+    var navScope = $rootScope.navScope;
+    navScope.items = [
+      {
+        fn: pdfPlugIn.createPDF,
+        text: 'Save as PDF'
+      },
+      {
+        fn: csvPlugIn.createCSV,
+        text: 'Export as CSV'
+      }
+    ];
+    navScope.contextMenu = 'Report';
 
   }]);
 

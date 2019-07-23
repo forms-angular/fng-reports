@@ -3,6 +3,7 @@ function ngGridCsvExportPlugin(opts) {
   var self = this;
   self.grid = null;
   self.scope = null;
+  self.services = null;
 
   self.init = function (scope, grid, services) {
 
@@ -20,6 +21,7 @@ function ngGridCsvExportPlugin(opts) {
 
     self.grid = grid;
     self.scope = scope;
+    self.services = services;
 
     if (!opts.inhibitButton) {
       setTimeout(doDownloadButton, 0);
@@ -63,21 +65,23 @@ function ngGridCsvExportPlugin(opts) {
     }
 
     var csvData = '';
-    angular.forEach(self.scope.columns, function (col) {
-      if (col.visible && (col.width === undefined || col.width > 0)) {
+    angular.forEach(self.grid.columns, function (col) {
+      if (col.visible && (col.width === undefined || col.width === '*' || col.width > 0)) {
         csvData += '"' + csvStringify(col.displayName) + '",';
       }
     });
 
     csvData = swapLastCommaForNewline(csvData);
 
-    angular.forEach(self.grid.filteredRows, function (row) {
-      angular.forEach(self.scope.columns, function (col) {
-        if (col.visible) {
-          csvData += '"' + csvStringify(row.entity[col.field]) + '",';
-        }
-      });
-      csvData = swapLastCommaForNewline(csvData);
+    angular.forEach(self.grid.rows, function (row) {
+      if (row.visible) {
+        angular.forEach(self.grid.columns, function (col) {
+          if (col.visible) {
+            csvData += '"' + csvStringify(row.entity[col.field]) + '",';
+          }
+        });
+        csvData = swapLastCommaForNewline(csvData);
+      }
     });
 
     return csvData;

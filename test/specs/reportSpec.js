@@ -24,6 +24,7 @@ describe('Reports', function () {
           {'_id': 'F', 'count': 11},
           {'_id': 'M', 'count': 6}
         ]});
+        $rootScope.navScope = {};
         var scope = $rootScope.$new();
         var routingService = {
           parsePathFunc: function () {
