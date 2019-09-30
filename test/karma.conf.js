@@ -5,6 +5,7 @@ module.exports = function(config) {
     files: [
       'node_modules/angular/angular.js',
       'node_modules/angular-sanitize/angular-sanitize.js',
+      'node_modules/angular-animate/angular-animate.js',
       'node_modules/angular-mocks/angular-mocks.js',
       'node_modules/angular-messages/angular-messages.js',
       'node_modules/jspdf/dist/jspdf.debug.js',
