@@ -1,4 +1,4 @@
-/*! forms-angular 2019-09-30 */
+/*! forms-angular 2019-10-08 */
 'use strict';
 
 formsAngular.controller('AnalysisCtrl', ['$rootScope', '$filter', '$scope', '$http', '$location', 'cssFrameworkService', 'routingService',
@@ -23,7 +23,7 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$filter', '$scope', '$ht
       showFooter: true,    // always set this to true so it works out the style
       reallyShowFooter: true,   // this determines whether it is actually displayed or not
       showTotals: true,
-      enableColumnResize: true,
+      enableColumnResizing: true,
 //        enableColumnReordering: true,
 //        jqueryUIDraggable: true,
       footerRowHeight: 65,
@@ -134,133 +134,135 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$filter', '$scope', '$ht
       csvPlugIn.createCSV();
     });
 
-    $scope.refreshQuery = function () {
+    if (!$scope.inhibitRefresh) {
+      $scope.refreshQuery = function () {
 
-      var apiCall = '/api/report/' + $scope.modelName,
-        connector = '?';
-      if ($scope.reportSchemaName) {
-        apiCall += '/' + $scope.reportSchemaName;
-      }
-
-      if ($scope.paramSchema) {
-        // we are using the params form
-        for (var paramVal in $scope.record) {
-          if ($scope.record.hasOwnProperty(paramVal)) {
-            var instructions = $scope.reportSchema.params[paramVal];
-            if ($scope.record[paramVal] && $scope.record[paramVal] !== '') {
-              $scope.param = $scope.record[paramVal];
-              if (instructions.conversionExpression) {
-                $scope.param = $scope.$eval(instructions.conversionExpression);
-              }
-              apiCall += connector + paramVal + '=' + $scope.param;
-              connector = '&';
-            } else if (instructions.required) {
-              // Don't do a round trip if a required field is empty - it will show up red
-              return;
-            }
-          }
+        var apiCall = '/api/report/' + $scope.modelName,
+            connector = '?';
+        if ($scope.reportSchemaName) {
+          apiCall += '/' + $scope.reportSchemaName;
         }
-      } else {
-        // take params of the URL
-        var query = $location.$$url.match(/\?.*/);
-        if (query) {
-          apiCall += connector + query[0].slice(1);
-        }
-      }
-      return $http.get(apiCall).then(function (response) {
-        var data = response.data;
-        if (data.success) {
-          $scope.report = data.report;
-          $scope.reportSchema = data.schema;
-          $scope.reportSchema.title = $scope.reportSchema.title || $scope.modelName;
-          $scope.reportSchema.title = $scope.reportSchema.title.replace(/\|.+?\|/g, function (match) {
-            var param = match.slice(1, -1);
-            var isParamTest = /\((.+)\)/.exec(param);
-            return isParamTest ? $scope.reportSchema.params[isParamTest[1]].value : '';
-            });
 
-          if (firstTime) {
-            firstTime = false;
-
-            $scope.$watch('reportSchema.columnDefs', function (newValue) {
-              var columnTotals = false;
-              if (newValue) {
-                for (var i = 0; i < newValue.length; i++) {
-                  if (newValue[i].totalsRow) {
-                    columnTotals = true;
-                  }
-                  if (newValue[i].align) {
-                    var alignClass = 'fng-' + newValue[i].align;
-                    newValue[i].cellClass = newValue[i].cellClass || '';
-                    if (newValue[i].cellClass.indexOf(alignClass) === -1) {
-                      newValue[i].cellClass = newValue[i].cellClass + ' ' + alignClass;
-                    }
-                  }
+        if ($scope.paramSchema) {
+          // we are using the params form
+          for (var paramVal in $scope.record) {
+            if ($scope.record.hasOwnProperty(paramVal)) {
+              var instructions = $scope.reportSchema.params[paramVal];
+              if ($scope.record[paramVal] && $scope.record[paramVal] !== '') {
+                $scope.param = $scope.record[paramVal];
+                if (instructions.conversionExpression) {
+                  $scope.param = $scope.$eval(instructions.conversionExpression);
                 }
-                // Auto-upgrade from ng-grid to ui-grid
-                newValue.forEach(function(def) {
-                    // Remove px from column widths
-                    if (def.width && typeof def.width === 'string' && def.width.indexOf('px') !== -1) {
-                        def.width = parseInt(def.width.slice(0, -2));
-                    }
-                });
-                $scope.gridOptions.columnDefs = newValue;
+                apiCall += connector + paramVal + '=' + $scope.param;
+                connector = '&';
+              } else if (instructions.required) {
+                // Don't do a round trip if a required field is empty - it will show up red
+                return;
               }
-              $scope.gridOptions.showTotals = columnTotals;
-              $scope.gridOptions.reallyShowFooter = columnTotals;
-              $scope.gridOptions.footerRowHeight = 55 + (columnTotals ? 10 : 0);
-            }, true);
-
-            if (!$scope.paramSchema && data.schema.params) {
-              $scope.paramSchema = [];
-              // set up parameters
-              $scope.record = {};
-              for (var param in data.schema.params) {
-                if (data.schema.params.hasOwnProperty(param)) {
-                  var thisPart = data.schema.params[param];
-                  // if noInput then this value will be inferred from another parameter
-                  if (!thisPart.noInput) {
-                    var newLen = $scope.paramSchema.push({
-                      name: param,
-                      id: 'fp_' + param,
-                      label: thisPart.label || $filter('titleCase')(param),
-                      type: thisPart.type || 'text',
-                      required: true,
-                      add: thisPart.add || undefined,
-                      size: thisPart.size || (cssFrameworkService.frameWork === 'bs3' ? 'large' : 'medium')
-                    });
-                    if (thisPart.type === 'select') {
-                      // TODO: Remove when select and select2 is modified during the restructure
-                      $scope[param + '_Opts'] = thisPart.enum;
-                      $scope.paramSchema[newLen - 1].options = param + '_Opts';
-                    }
-                  }
-                  var dateTest = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3})(Z|[+ -]\d{4})$/.exec(thisPart.value);
-                  if (dateTest) {
-                    thisPart.value = (moment(dateTest[1]).format('YYYY-MM-DDTHH:mm:ss.SSS')) + 'Z';
-                  }
-                  $scope.record[param] = thisPart.value;
-                }
-              }
-              $scope.$watch('record', function (newValue, oldValue) {
-                if (oldValue !== newValue) {
-                  $scope.refreshQuery();
-                }
-              }, true);
-
             }
           }
         } else {
-          console.log(JSON.stringify(data));
-          $scope.reportSchema.title = 'Error - see console log';
+          // take params of the URL
+          var query = $location.$$url.match(/\?.*/);
+          if (query) {
+            apiCall += connector + query[0].slice(1);
+          }
         }
-      }, function (response) {
-        console.log(JSON.stringify(response));
-        $location.path('/404');
-      });
-    };
+        return $http.get(apiCall).then(function (response) {
+          var data = response.data;
+          if (data.success) {
+            $scope.report = data.report;
+            $scope.reportSchema = data.schema;
+            $scope.reportSchema.title = $scope.reportSchema.title || $scope.modelName;
+            $scope.reportSchema.title = $scope.reportSchema.title.replace(/\|.+?\|/g, function (match) {
+              var param = match.slice(1, -1);
+              var isParamTest = /\((.+)\)/.exec(param);
+              return isParamTest ? $scope.reportSchema.params[isParamTest[1]].value : '';
+            });
 
-    $scope.refreshQuery();
+            if (firstTime) {
+              firstTime = false;
+
+              $scope.$watch('reportSchema.columnDefs', function (newValue) {
+                var columnTotals = false;
+                if (newValue) {
+                  for (var i = 0; i < newValue.length; i++) {
+                    if (newValue[i].totalsRow) {
+                      columnTotals = true;
+                    }
+                    if (newValue[i].align) {
+                      var alignClass = 'fng-' + newValue[i].align;
+                      newValue[i].cellClass = newValue[i].cellClass || '';
+                      if (newValue[i].cellClass.indexOf(alignClass) === -1) {
+                        newValue[i].cellClass = newValue[i].cellClass + ' ' + alignClass;
+                      }
+                    }
+                  }
+                  // Auto-upgrade from ng-grid to ui-grid
+                  newValue.forEach(function (def) {
+                    // Remove px from column widths
+                    if (def.width && typeof def.width === 'string' && def.width.indexOf('px') !== -1) {
+                      def.width = parseInt(def.width.slice(0, -2));
+                    }
+                  });
+                  $scope.gridOptions.columnDefs = newValue;
+                }
+                $scope.gridOptions.showTotals = columnTotals;
+                $scope.gridOptions.reallyShowFooter = columnTotals;
+                $scope.gridOptions.footerRowHeight = 55 + (columnTotals ? 10 : 0);
+              }, true);
+
+              if (!$scope.paramSchema && data.schema.params) {
+                $scope.paramSchema = [];
+                // set up parameters
+                $scope.record = {};
+                for (var param in data.schema.params) {
+                  if (data.schema.params.hasOwnProperty(param)) {
+                    var thisPart = data.schema.params[param];
+                    // if noInput then this value will be inferred from another parameter
+                    if (!thisPart.noInput) {
+                      var newLen = $scope.paramSchema.push({
+                        name: param,
+                        id: 'fp_' + param,
+                        label: thisPart.label || $filter('titleCase')(param),
+                        type: thisPart.type || 'text',
+                        required: true,
+                        add: thisPart.add || undefined,
+                        size: thisPart.size || (cssFrameworkService.frameWork === 'bs3' ? 'large' : 'medium')
+                      });
+                      if (thisPart.type === 'select') {
+                        // TODO: Remove when select and select2 is modified during the restructure
+                        $scope[param + '_Opts'] = thisPart.enum;
+                        $scope.paramSchema[newLen - 1].options = param + '_Opts';
+                      }
+                    }
+                    var dateTest = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3})(Z|[+ -]\d{4})$/.exec(thisPart.value);
+                    if (dateTest) {
+                      thisPart.value = (moment(dateTest[1]).format('YYYY-MM-DDTHH:mm:ss.SSS')) + 'Z';
+                    }
+                    $scope.record[param] = thisPart.value;
+                  }
+                }
+                $scope.$watch('record', function (newValue, oldValue) {
+                  if (oldValue !== newValue) {
+                    $scope.refreshQuery();
+                  }
+                }, true);
+
+              }
+            }
+          } else {
+            console.log(JSON.stringify(data));
+            $scope.reportSchema.title = 'Error - see console log';
+          }
+        }, function (response) {
+          console.log(JSON.stringify(response));
+          $location.path('/404');
+        });
+      };
+
+      $scope.refreshQuery();
+    }
     var navScope = $rootScope.navScope;
     navScope.items = [
       {

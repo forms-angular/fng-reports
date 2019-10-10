@@ -17,7 +17,6 @@ Add the following lines to your index.html (or equivalent) file
     
     <script src="angular-ui-grid/ui-grid.js"></script>
     <script src="jspdf/dist/jspdf.min.js"></script>
-    <script src="jspdf/dist/jspdf.min.js"></script>
     <script src="fng-reports/dist/fng-reports.js"></script>
     
 The full documentation, which includes examples, is at www.forms-angular.org/#/plugins 
