@@ -21,7 +21,7 @@
     "angular-ui-grid": "4.8.3",
     "jquery": "3.4.1",
     "jspdf": "1.5.3",
-    "jspdf-autotable": "^3.2.11"
+    "jspdf-autotable": "^3.2.13"
   },
   "devDependencies": {
     "angular": "^1.7.9",
@@ -47,7 +47,7 @@
     "jasmine-core": "3.5.0",
     "karma": "^4.4.1",
     "karma-chrome-launcher": "3.1.0",
-    "karma-jasmine": "3.1.0",
+    "karma-jasmine": "3.1.1",
     "karma-junit-reporter": "2.0.1",
     "lodash": "^4.17.15",
     "matchdep": "2.0.0",
