@@ -43,7 +43,7 @@
     "grunt-newer": "1.3.0",
     "grunt-ng-annotate": "3.0.0",
     "grunt-rev": "0.1.0",
-    "grunt-usemin": "mchapman/grunt-usemin",
+    "grunt-usemin": "github:mchapman/grunt-usemin",
     "jasmine-core": "3.5.0",
     "karma": "^4.4.1",
     "karma-chrome-launcher": "3.1.0",
