@@ -1,8 +1,8 @@
-/*! forms-angular 2020-04-07 */
+/*! forms-angular 2020-04-09 */
 'use strict';
 
-formsAngular.controller('AnalysisCtrl', ['$rootScope', '$filter', '$scope', '$http', '$location', 'cssFrameworkService', 'routingService',
-  function ($rootScope, $filter, $scope, $http, $location, cssFrameworkService, routingService) {
+formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$scope', '$http', '$location', 'cssFrameworkService', 'routingService',
+  function ($rootScope, $window, $filter, $scope, $http, $location, cssFrameworkService, routingService) {
     /*jshint newcap: false */
     var firstTime = true,
       pdfPlugIn = new ngGridPdfExportPlugin({inhibitButton: true}),
@@ -42,7 +42,7 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$filter', '$scope', '$ht
                   }));
                   window.location = url;
               }
-          })
+          });
       },
       footerTemplate: '<div ng-show="gridOptions.reallyShowFooter" class="ngFooterPanel" ng-class="{\'ui-widget-content\': jqueryUITheme, \'ui-corner-bottom\': jqueryUITheme}" ' +
         'ng-style="footerStyle()">' +
@@ -133,6 +133,16 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$filter', '$scope', '$ht
     $scope.$on('exportToCSV', function () {
       csvPlugIn.createCSV();
     });
+
+    var container = document.querySelector('div.report-grow');
+    if (container) {
+        var margin = container.offsetLeft;  // let's have the same top and bottom margins as we have side margin
+        var topOffset = container.offsetTop + margin;
+        var header = document.querySelector('div.ui-grid-header');
+        var headerHeight = header ? header.clientHeight : 31;
+        var availRows = Math.floor(($window.innerHeight - topOffset - headerHeight - margin) / 30);
+        angular.element(container).css('height', '' + availRows * 30 + 'px');
+    }
 
     if (!$scope.inhibitRefresh) {
       $scope.refreshQuery = function () {
