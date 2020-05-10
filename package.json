@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "angular-ui-grid": "4.8.3",
-    "jquery": "3.4.1",
+    "jquery": "3.5.0",
     "jspdf": "1.5.3",
     "jspdf-autotable": "^3.3.2"
   },
