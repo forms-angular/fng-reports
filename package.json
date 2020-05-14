@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "angular-ui-grid": "4.8.3",
-    "jquery": "3.4.1",
+    "jquery": "^3.5.1",
     "jspdf": "1.5.3",
     "jspdf-autotable": "^3.3.2"
   },
@@ -45,7 +45,7 @@
     "grunt-rev": "0.1.0",
     "grunt-usemin": "github:mchapman/grunt-usemin",
     "jasmine-core": "3.5.0",
-    "karma": "^4.4.1",
+    "karma": "^5.0.5",
     "karma-chrome-launcher": "3.1.0",
     "karma-jasmine": "3.1.1",
     "karma-junit-reporter": "2.0.1",
