@@ -4,8 +4,8 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$s
   function ($rootScope, $window, $filter, $scope, $http, $location, cssFrameworkService, routingService) {
     /*jshint newcap: false */
     var firstTime = true,
-      pdfPlugIn = new ngGridPdfExportPlugin({inhibitButton: true}),
-      csvPlugIn = new ngGridCsvExportPlugin({inhibitButton: true});
+        pdfPlugIn = new ngGridPdfExportPlugin({inhibitButton: true}),
+        csvPlugIn = new ngGridCsvExportPlugin({inhibitButton: true});
     /*jshint newcap: true */
 
     angular.extend($scope, routingService.parsePathFunc()($location.$$path));
@@ -29,59 +29,72 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$s
       multiSelect: false,
       plugins: [pdfPlugIn, csvPlugIn],
       onRegisterApi : function (gridApi) {
-          $scope.gridApi = gridApi;
-          $scope.gridOptions.plugins.forEach(function(p) {p.init($scope, gridApi.grid, null); });
-          gridApi.selection.on.rowSelectionChanged($scope, function afterSelectionChange(rowItem) {
-              var url = $scope.reportSchema.drilldown;
-              if (url) {
-                  url = routingService.buildUrl(url.replace(/\|.+?\|/g, function (match) {
-                      var param = match.slice(1, -1),
-                          isParamTest = /\((.+)\)/.exec(param);
-                      return isParamTest ? $scope.reportSchema.params[isParamTest[1]].value : rowItem.entity[param];
-                  }));
-                  window.location = url;
+        $scope.gridApi = gridApi;
+        $scope.gridOptions.plugins.forEach(function(p) {p.init($scope, gridApi.grid, null); });
+        gridApi.selection.on.rowSelectionChanged($scope, function afterSelectionChange(rowItem) {
+          var url = $scope.reportSchema.drilldown;
+          if (url) {
+            url = routingService.buildUrl(url.replace(/\|.+?\|/g, function (match) {
+              var param = match.slice(1, -1),
+                  isParamTest = /\((.+)\)/.exec(param);
+              if (isParamTest) {
+                var instructions = $scope.reportSchema.params[isParamTest[1]];
+                if (instructions) {
+                  $scope.param = $scope.record[isParamTest[1]];
+                  if (instructions.conversionExpression) {
+                    return $scope.$eval(instructions.conversionExpression);
+                  }
+                } else {
+                  return $scope.reportSchema.params[isParamTest[1]].value
+                }
+              } else {
+                return rowItem.entity[param];
               }
-          });
+            }));
+            window.location = url;
+          }
+        });
       },
       footerTemplate: '<div ng-show="gridOptions.reallyShowFooter" class="ngFooterPanel" ng-class="{\'ui-widget-content\': jqueryUITheme, \'ui-corner-bottom\': jqueryUITheme}" ' +
-        'ng-style="footerStyle()">' +
-        '<div ng-show="gridOptions.showTotals" ng-style="{height: rowHeight+3}">' +
-        '<div ng-style="{ \'cursor\': row.cursor }" ng-repeat="col in renderedColumns" ng-class="col.colIndex()" class="ngCell ngTotalCell {{col.cellClass}}">' +
-        '<div class="ngVerticalBar" ng-style="{height: rowHeight}" ng-class="{ ngVerticalBarVisible: !$last }">&nbsp;</div>' +
-        '<div ng-total-cell></div>' +
-        ' </div>' +
-        '</div>' +
-        '<div class="ngTotalSelectContainer" >' +
-        '<div class="ngFooterTotalItems" ng-class="{\'ngNoMultiSelect\': !multiSelect}" >' +
-        '<span class="ngLabel">{{i18n.ngTotalItemsLabel}} {{maxRows()}}</span><span ng-show="filterText.length > 0" class="ngLabel">' +
-        '({{i18n.ngShowingItemsLabel}} {{totalFilteredItemsLength()}})</span>' +
-        '</div>' +
-        '<div class="ngFooterSelectedItems" ng-show="multiSelect">' +
-        '  <span class="ngLabel">{{i18n.ngSelectedItemsLabel}} {{selectedItems.length}}</span>' +
-        '</div>' +
-        '</div>' +
-        '<div class="ngPagerContainer" style="float: right; margin-top: 10px;" ng-show="enablePaging" ng-class="{\'ngNoMultiSelect\': !multiSelect}">' +
-        '<div style="float:left; margin-right: 10px;" class="ngRowCountPicker">' +
-        '<span style="float: left; margin-top: 3px;" class="ngLabel">{{i18n.ngPageSizeLabel}}</span>' +
-        '<select style="float: left;height: 27px; width: 100px" ng-model="pagingOptions.pageSize" >' +
-        '<option ng-repeat="size in pagingOptions.pageSizes">{{size}}</option>' +
-        '</select>' +
-        '</div>' +
-        '<div style="float:left; margin-right: 10px; line-height:25px;" class="ngPagerControl" style="float: left; min-width: 135px;">' +
-        '<button class="ngPagerButton" ng-click="pageToFirst()" ng-disabled="cantPageBackward()" title="{{i18n.ngPagerFirstTitle}}">' +
-        '<div class="ngPagerFirstTriangle"><div class="ngPagerFirstBar"></div></div></button>' +
-        '<button class="ngPagerButton" ng-click="pageBackward()" ng-disabled="cantPageBackward()" title="{{i18n.ngPagerPrevTitle}}">' +
-        '<div class="ngPagerFirstTriangle ngPagerPrevTriangle"></div></button>' +
-        '<input class="ngPagerCurrent" min="1" max="{{maxPages()}}" type="number" style="width:50px; height: 24px; margin-top: 1px; padding: 0 4px;" ng-model="pagingOptions.currentPage"/>' +
-        '<button class="ngPagerButton" ng-click="pageForward()" ng-disabled="cantPageForward()" title="{{i18n.ngPagerNextTitle}}">' +
-        '<div class="ngPagerLastTriangle ngPagerNextTriangle"></div></button>' +
-        '<button class="ngPagerButton" ng-click="pageToLast()" ng-disabled="cantPageToLast()" title="{{i18n.ngPagerLastTitle}}">' +
-        '<div class="ngPagerLastTriangle"><div class="ngPagerLastBar"></div></div></button>' +
-        '</div>' +
-        '</div>' +
-        '</div>'
+          'ng-style="footerStyle()">' +
+          '<div ng-show="gridOptions.showTotals" ng-style="{height: rowHeight+3}">' +
+          '<div ng-style="{ \'cursor\': row.cursor }" ng-repeat="col in renderedColumns" ng-class="col.colIndex()" class="ngCell ngTotalCell {{col.cellClass}}">' +
+          '<div class="ngVerticalBar" ng-style="{height: rowHeight}" ng-class="{ ngVerticalBarVisible: !$last }">&nbsp;</div>' +
+          '<div ng-total-cell></div>' +
+          ' </div>' +
+          '</div>' +
+          '<div class="ngTotalSelectContainer" >' +
+          '<div class="ngFooterTotalItems" ng-class="{\'ngNoMultiSelect\': !multiSelect}" >' +
+          '<span class="ngLabel">{{i18n.ngTotalItemsLabel}} {{maxRows()}}</span><span ng-show="filterText.length > 0" class="ngLabel">' +
+          '({{i18n.ngShowingItemsLabel}} {{totalFilteredItemsLength()}})</span>' +
+          '</div>' +
+          '<div class="ngFooterSelectedItems" ng-show="multiSelect">' +
+          '  <span class="ngLabel">{{i18n.ngSelectedItemsLabel}} {{selectedItems.length}}</span>' +
+          '</div>' +
+          '</div>' +
+          '<div class="ngPagerContainer" style="float: right; margin-top: 10px;" ng-show="enablePaging" ng-class="{\'ngNoMultiSelect\': !multiSelect}">' +
+          '<div style="float:left; margin-right: 10px;" class="ngRowCountPicker">' +
+          '<span style="float: left; margin-top: 3px;" class="ngLabel">{{i18n.ngPageSizeLabel}}</span>' +
+          '<select style="float: left;height: 27px; width: 100px" ng-model="pagingOptions.pageSize" >' +
+          '<option ng-repeat="size in pagingOptions.pageSizes">{{size}}</option>' +
+          '</select>' +
+          '</div>' +
+          '<div style="float:left; margin-right: 10px; line-height:25px;" class="ngPagerControl" style="float: left; min-width: 135px;">' +
+          '<button class="ngPagerButton" ng-click="pageToFirst()" ng-disabled="cantPageBackward()" title="{{i18n.ngPagerFirstTitle}}">' +
+          '<div class="ngPagerFirstTriangle"><div class="ngPagerFirstBar"></div></div></button>' +
+          '<button class="ngPagerButton" ng-click="pageBackward()" ng-disabled="cantPageBackward()" title="{{i18n.ngPagerPrevTitle}}">' +
+          '<div class="ngPagerFirstTriangle ngPagerPrevTriangle"></div></button>' +
+          '<input class="ngPagerCurrent" min="1" max="{{maxPages()}}" type="number" style="width:50px; height: 24px; margin-top: 1px; padding: 0 4px;" ng-model="pagingOptions.currentPage"/>' +
+          '<button class="ngPagerButton" ng-click="pageForward()" ng-disabled="cantPageForward()" title="{{i18n.ngPagerNextTitle}}">' +
+          '<div class="ngPagerLastTriangle ngPagerNextTriangle"></div></button>' +
+          '<button class="ngPagerButton" ng-click="pageToLast()" ng-disabled="cantPageToLast()" title="{{i18n.ngPagerLastTitle}}">' +
+          '<div class="ngPagerLastTriangle"><div class="ngPagerLastBar"></div></div></button>' +
+          '</div>' +
+          '</div>' +
+          '</div>'
     };
     $scope.report = [];
+
 
     if (!$scope.reportSchemaName && $location.$$search.r) {
       switch ($location.$$search.r.slice(0, 1)) {
@@ -98,9 +111,9 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$s
 
     $scope.getTotalVal = function (field, filter) {
       var result = '',
-        instructions = _.find($scope.reportSchema.columnDefs, function (col) {
-          return col.field === field;
-        });
+          instructions = _.find($scope.reportSchema.columnDefs, function (col) {
+            return col.field === field;
+          });
 
       if (instructions) {
         switch (instructions.totalsRow) {
@@ -135,12 +148,12 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$s
 
     var container = document.querySelector('div.report-grow');
     if (container) {
-        var margin = container.offsetLeft;  // let's have the same top and bottom margins as we have side margin
-        var topOffset = container.offsetTop + margin;
-        var header = document.querySelector('div.ui-grid-header');
-        var headerHeight = header ? header.clientHeight : 31;
-        var availRows = Math.floor(($window.innerHeight - topOffset - headerHeight - margin) / 30);
-        angular.element(container).css('height', '' + availRows * 30 + 'px');
+      var margin = container.offsetLeft;  // let's have the same top and bottom margins as we have side margin
+      var topOffset = container.offsetTop + margin;
+      var header = document.querySelector('div.ui-grid-header');
+      var headerHeight = header ? header.clientHeight : 31;
+      var availRows = Math.floor(($window.innerHeight - topOffset - headerHeight - margin) / 30);
+      angular.element(container).css('height', '' + availRows * 30 + 'px');
     }
 
     if (!$scope.inhibitRefresh) {
@@ -247,7 +260,7 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$s
                     }
                     var dateTest = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3})(Z|[+ -]\d{4})$/.exec(thisPart.value);
                     if (dateTest) {
-                      thisPart.value = (moment(dateTest[1]).format('YYYY-MM-DDTHH:mm:ss.SSS')) + 'Z';
+                      thisPart.value = new Date(dateTest[1]);
                     }
                     $scope.record[param] = thisPart.value;
                   }
@@ -286,6 +299,3 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$s
     navScope.contextMenu = 'Report';
 
   }]);
-
-
-
