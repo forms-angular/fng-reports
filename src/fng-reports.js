@@ -45,7 +45,7 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$s
                     return $scope.$eval(instructions.conversionExpression);
                   }
                 } else {
-                  return $scope.reportSchema.params[isParamTest[1]].value
+                  return $scope.reportSchema.params[isParamTest[1]].value;
                 }
               } else {
                 return rowItem.entity[param];
@@ -297,5 +297,10 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$s
       }
     ];
     navScope.contextMenu = 'Report';
+
+    $scope.$on('$locationChangeStart', function() {
+      delete navScope.contextMenu;
+      delete navScope.items;
+    });
 
   }]);
