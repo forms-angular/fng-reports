@@ -18,9 +18,9 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$s
       columnDefs: $scope.reportSchema.columnDefs,
       showColumnMenu: true,
       enableRowHeaderSelection: false,
-      showFilter: true,
-      showFooter: true,    // always set this to true so it works out the style
-      reallyShowFooter: true,   // this determines whether it is actually displayed or not
+      enableFiltering: false,
+      showGridFooter: false,
+      reallyShowFooter: false,   // this determines whether it is actually displayed or not
       showTotals: true,
       enableColumnResizing: true,
 //        enableColumnReordering: true,
@@ -55,43 +55,6 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$s
           }
         });
       },
-      footerTemplate: '<div ng-show="gridOptions.reallyShowFooter" class="ngFooterPanel" ng-class="{\'ui-widget-content\': jqueryUITheme, \'ui-corner-bottom\': jqueryUITheme}" ' +
-          'ng-style="footerStyle()">' +
-          '<div ng-show="gridOptions.showTotals" ng-style="{height: rowHeight+3}">' +
-          '<div ng-style="{ \'cursor\': row.cursor }" ng-repeat="col in renderedColumns" ng-class="col.colIndex()" class="ngCell ngTotalCell {{col.cellClass}}">' +
-          '<div class="ngVerticalBar" ng-style="{height: rowHeight}" ng-class="{ ngVerticalBarVisible: !$last }">&nbsp;</div>' +
-          '<div ng-total-cell></div>' +
-          ' </div>' +
-          '</div>' +
-          '<div class="ngTotalSelectContainer" >' +
-          '<div class="ngFooterTotalItems" ng-class="{\'ngNoMultiSelect\': !multiSelect}" >' +
-          '<span class="ngLabel">{{i18n.ngTotalItemsLabel}} {{maxRows()}}</span><span ng-show="filterText.length > 0" class="ngLabel">' +
-          '({{i18n.ngShowingItemsLabel}} {{totalFilteredItemsLength()}})</span>' +
-          '</div>' +
-          '<div class="ngFooterSelectedItems" ng-show="multiSelect">' +
-          '  <span class="ngLabel">{{i18n.ngSelectedItemsLabel}} {{selectedItems.length}}</span>' +
-          '</div>' +
-          '</div>' +
-          '<div class="ngPagerContainer" style="float: right; margin-top: 10px;" ng-show="enablePaging" ng-class="{\'ngNoMultiSelect\': !multiSelect}">' +
-          '<div style="float:left; margin-right: 10px;" class="ngRowCountPicker">' +
-          '<span style="float: left; margin-top: 3px;" class="ngLabel">{{i18n.ngPageSizeLabel}}</span>' +
-          '<select style="float: left;height: 27px; width: 100px" ng-model="pagingOptions.pageSize" >' +
-          '<option ng-repeat="size in pagingOptions.pageSizes">{{size}}</option>' +
-          '</select>' +
-          '</div>' +
-          '<div style="float:left; margin-right: 10px; line-height:25px;" class="ngPagerControl" style="float: left; min-width: 135px;">' +
-          '<button class="ngPagerButton" ng-click="pageToFirst()" ng-disabled="cantPageBackward()" title="{{i18n.ngPagerFirstTitle}}">' +
-          '<div class="ngPagerFirstTriangle"><div class="ngPagerFirstBar"></div></div></button>' +
-          '<button class="ngPagerButton" ng-click="pageBackward()" ng-disabled="cantPageBackward()" title="{{i18n.ngPagerPrevTitle}}">' +
-          '<div class="ngPagerFirstTriangle ngPagerPrevTriangle"></div></button>' +
-          '<input class="ngPagerCurrent" min="1" max="{{maxPages()}}" type="number" style="width:50px; height: 24px; margin-top: 1px; padding: 0 4px;" ng-model="pagingOptions.currentPage"/>' +
-          '<button class="ngPagerButton" ng-click="pageForward()" ng-disabled="cantPageForward()" title="{{i18n.ngPagerNextTitle}}">' +
-          '<div class="ngPagerLastTriangle ngPagerNextTriangle"></div></button>' +
-          '<button class="ngPagerButton" ng-click="pageToLast()" ng-disabled="cantPageToLast()" title="{{i18n.ngPagerLastTitle}}">' +
-          '<div class="ngPagerLastTriangle"><div class="ngPagerLastBar"></div></div></button>' +
-          '</div>' +
-          '</div>' +
-          '</div>'
     };
     $scope.report = [];
 
@@ -201,6 +164,11 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$s
               var isParamTest = /\((.+)\)/.exec(param);
               return isParamTest ? $scope.reportSchema.params[isParamTest[1]].value : '';
             });
+            $scope.gridOptions.enableFiltering = !!$scope.reportSchema.filter;
+
+            /*
+            Generate link data
+             */
 
             if (firstTime) {
               firstTime = false;
