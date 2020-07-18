@@ -119,6 +119,7 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$s
       angular.element(container).css('height', '' + availRows * 30 + 'px');
     }
 
+    //  inhibitRefresh can be set by a controller, for example if report data is being provided as part of the URL
     if (!$scope.inhibitRefresh) {
       $scope.refreshQuery = function () {
 
