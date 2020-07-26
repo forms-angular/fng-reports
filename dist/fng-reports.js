@@ -1,8 +1,8 @@
-/*! forms-angular 2020-06-30 */
+/*! forms-angular 2020-07-26 */
 'use strict';
 
-formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$timeout', '$filter', '$scope', '$http', '$location', 'cssFrameworkService', 'routingService',
-  function ($rootScope, $window, $timeout, $filter, $scope, $http, $location, cssFrameworkService, routingService) {
+formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$scope', '$http', '$location', 'cssFrameworkService', 'routingService',
+  function ($rootScope, $window, $filter, $scope, $http, $location, cssFrameworkService, routingService) {
     /*jshint newcap: false */
     var firstTime = true,
         pdfPlugIn = new ngGridPdfExportPlugin({inhibitButton: true}),
@@ -120,6 +120,20 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$timeout', '$
       angular.element(container).css('height', '' + availRows * 30 + 'px');
     }
 
+    var navScope = $rootScope.navScope;
+    navScope.items = [
+      {
+        fn: pdfPlugIn.createPDF,
+        text: 'Save as PDF'
+      },
+      {
+        fn: csvPlugIn.createCSV,
+        text: 'Export as CSV'
+      }
+    ];
+    navScope.contextMenu = 'Report';
+
+    //  inhibitRefresh can be set by a controller, for example if report data is being provided as part of the URL
     if (!$scope.inhibitRefresh) {
       $scope.refreshQuery = function () {
 
@@ -166,7 +180,14 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$timeout', '$
               return isParamTest ? $scope.reportSchema.params[isParamTest[1]].value : '';
             });
             $scope.gridOptions.enableFiltering = !!$scope.reportSchema.filter;
-            $scope.addLinkColumn = !!$scope.reportSchema.linkColumn;
+            navScope.items.length = 2;
+            if ($scope.reportSchema.menu) {
+              navScope.items = navScope.items.concat($scope.reportSchema.menu);
+            }
+
+            /*
+            Generate link data
+             */
 
             if (firstTime) {
               firstTime = false;
@@ -251,18 +272,6 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$timeout', '$
 
       $scope.refreshQuery();
     }
-    var navScope = $rootScope.navScope;
-    navScope.items = [
-      {
-        fn: pdfPlugIn.createPDF,
-        text: 'Save as PDF'
-      },
-      {
-        fn: csvPlugIn.createCSV,
-        text: 'Export as CSV'
-      }
-    ];
-    navScope.contextMenu = 'Report';
 
     $scope.$on('$locationChangeStart', function() {
       delete navScope.contextMenu;
