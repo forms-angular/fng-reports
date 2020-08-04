@@ -1,3 +1,4 @@
+// See http://ui-grid.info/docs/#!/api/ui.grid.class:GridOptions.columnDef for details and full list of options
 export interface IColumnDef {
     name: string;
     field: string;
@@ -5,6 +6,12 @@ export interface IColumnDef {
     align?: string;
     cellFilter?: string;
     totalsRow?: string;
+    width?: number | string;
+    maxWidth?: number;
+    minWidth? : number;
+    enableFiltering?: boolean;
+    enableSorting?: boolean;
+    cellTemplate?: string;
 }
 
 export interface IReportSchema {
