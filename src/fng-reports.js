@@ -140,6 +140,13 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$s
             connector = '?';
         if ($scope.reportSchemaName) {
           apiCall += '/' + $scope.reportSchemaName;
+        } else {
+          // take params of the URL
+          var query = $location.$$url.match(/\?.*/);
+          if (query) {
+            apiCall += connector + query[0].slice(1);
+            connector = '&';
+          }
         }
 
         if ($scope.paramSchema) {
@@ -160,12 +167,6 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$s
               }
             }
           }
-        } else {
-          // take params of the URL
-          var query = $location.$$url.match(/\?.*/);
-          if (query) {
-            apiCall += connector + query[0].slice(1);
-          }
         }
         return $http.get(apiCall).then(function (response) {
           var data = response.data;
@@ -179,9 +180,11 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$s
               return isParamTest ? $scope.reportSchema.params[isParamTest[1]].value : '';
             });
             $scope.gridOptions.enableFiltering = !!$scope.reportSchema.filter;
-            navScope.items.length = 2;
-            if ($scope.reportSchema.menu) {
-              navScope.items = navScope.items.concat($scope.reportSchema.menu);
+            if (navScope && navScope.items) {
+              navScope.items.length = 2;
+              if ($scope.reportSchema.menu) {
+                navScope.items = navScope.items.concat($scope.reportSchema.menu);
+              }
             }
 
             /*
