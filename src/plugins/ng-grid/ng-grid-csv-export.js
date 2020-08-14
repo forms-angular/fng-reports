@@ -6,38 +6,23 @@ function ngGridCsvExportPlugin(opts) {
   self.services = null;
 
   self.init = function (scope, grid, services) {
-
-    function doDownloadButton() {
-      var fp = angular.element('h1').parent();
-      var csvDataLinkPrevious = angular.element('#csv-data-link');
-      if (csvDataLinkPrevious != null) {
-        csvDataLinkPrevious.remove();
-      }
-      var csvDataLinkHtml = "<button id=\"csv-data-link\" class=\"btn\"><a href=\"data:text/csv;charset=UTF-8,";
-      csvDataLinkHtml += encodeURIComponent(self.prepareCSV());
-      csvDataLinkHtml += "\" download=\"Export.csv\">CSV Export</button>";
-      fp.append(csvDataLinkHtml);
-    }
-
     self.grid = grid;
     self.scope = scope;
     self.services = services;
-
-    if (!opts.inhibitButton) {
-      setTimeout(doDownloadButton, 0);
-      scope.catHashKeys = function () {
-        var hash = '';
-        for (var idx in scope.renderedRows) {
-          hash += scope.renderedRows[idx].$$hashKey;
-        }
-        return hash;
-      };
-      scope.$watch('catHashKeys()', doDownloadButton);
-    }
   };
 
+  function downloadFile(fileName, urlData) {
+
+    var aLink = document.createElement('a');
+    aLink.download = fileName;
+    aLink.href = urlData;
+
+    var event = new MouseEvent('click');
+    aLink.dispatchEvent(event);
+  }
+
   self.createCSV = function () {
-    window.open('data:text/csv;charset=UTF-8,' + encodeURIComponent(self.prepareCSV()));
+    downloadFile(self.scope.reportSchema.title + '.csv','data:text/csv;charset=UTF-8,' + encodeURIComponent(self.prepareCSV()));
   };
 
   self.prepareCSV = function () {
