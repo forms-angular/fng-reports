@@ -1,4 +1,4 @@
-/*! forms-angular 2020-08-14 */
+/*! forms-angular 2020-08-15 */
 'use strict';
 
 formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$scope', '$http', '$location', 'cssFrameworkService', 'routingService',
@@ -132,10 +132,19 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$s
       }
     ];
     navScope.contextMenu = 'Report';
+    $scope.titleWithSubstitutions = $scope.reportSchema.title;
 
     //  inhibitRefresh can be set by a controller, for example if report data is being provided as part of the URL
     if (!$scope.inhibitRefresh) {
       $scope.refreshQuery = function () {
+
+        function substituteParams(str) {
+          return str.replace(/\|.+?\|/g, function (match) {
+            var param = match.slice(1, -1);
+            var isParamTest = /\((.+)\)/.exec(param);
+            return isParamTest ? $scope.reportSchema.params[isParamTest[1]].value : '';
+          });
+        }
 
         var apiCall = '/api/report/' + $scope.modelName,
             connector = '?';
@@ -175,16 +184,14 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$s
             $scope.report = data.report;
             $scope.reportSchema = data.schema;
             $scope.reportSchema.title = $scope.reportSchema.title || $scope.modelName;
-            $scope.reportSchema.title = $scope.reportSchema.title.replace(/\|.+?\|/g, function (match) {
-              var param = match.slice(1, -1);
-              var isParamTest = /\((.+)\)/.exec(param);
-              return isParamTest ? $scope.reportSchema.params[isParamTest[1]].value : '';
-            });
+            $scope.titleWithSubstitutions = substituteParams($scope.reportSchema.title);
             $scope.gridOptions.enableFiltering = !!$scope.reportSchema.filter;
             if (navScope && navScope.items) {
               navScope.items.length = 2;
               if ($scope.reportSchema.menu) {
-                navScope.items = navScope.items.concat($scope.reportSchema.menu);
+                $scope.reportSchema.menu.forEach(function(m){
+                  navScope.items.push(JSON.parse(substituteParams(JSON.stringify(m))));
+                });
               }
             }
 
