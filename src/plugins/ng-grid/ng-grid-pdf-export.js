@@ -39,7 +39,8 @@ function ngGridPdfExportPlugin(options) {
     var headers = [],
         headerNames = [],
         footers = [],
-        data = [];
+        data = [],
+        filters = {};
 
     angular.forEach(self.grid.columns, function (col) {
       if (col.visible) {
@@ -49,13 +50,18 @@ function ngGridPdfExportPlugin(options) {
       if (col.colDef.totalsRow) {
         footers[col.field] = self.grid.getTotalVal(col.field, col.filter).toString();
       }
+      self.scope.extractFilter(col, filters);
     });
 
     angular.forEach(self.grid.rows, function (row) {
       var output = [];
       if (row.visible) {
         headerNames.forEach(function(h) {
-          output.push(row.entity[h]);
+          var val = row.entity[h];
+          if (filters[h]) {
+            val = filters[h].filter(val, filters[h].filterParam);
+          }
+          output.push(val);
         });
         data.push(output);
       }

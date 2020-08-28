@@ -109,6 +109,21 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$s
       csvPlugIn.createCSV();
     });
 
+    $scope.extractFilter = function(col, filters) {
+      if (col.cellFilter) {
+        var paramPos = col.cellFilter.indexOf(':');
+        var filter = angular.element(document.body).injector().get('$filter')(col.cellFilter.slice(0, paramPos).trim());
+        var filterParam;
+        if (paramPos !== -1) {
+          filterParam = col.cellFilter.slice(paramPos + 1, 999).trim();
+          if (filterParam[0] === '\'' || filterParam[0] === '"') {
+            filterParam = filterParam.slice(1,-1);
+          }
+        }
+        filters[col.field] = {filter: filter, filterParam: filterParam };
+      }
+    };
+
     var container = document.querySelector('div.report-grow');
     if (container) {
       var margin = container.offsetLeft;  // let's have the same top and bottom margins as we have side margin

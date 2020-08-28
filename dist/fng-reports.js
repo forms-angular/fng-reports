@@ -1,4 +1,4 @@
-/*! forms-angular 2020-08-15 */
+/*! forms-angular 2020-08-28 */
 'use strict';
 
 formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$scope', '$http', '$location', 'cssFrameworkService', 'routingService',
@@ -109,6 +109,21 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$s
     $scope.$on('exportToCSV', function () {
       csvPlugIn.createCSV();
     });
+
+    $scope.extractFilter = function(col, filters) {
+      if (col.cellFilter) {
+        var paramPos = col.cellFilter.indexOf(':');
+        var filter = angular.element(document.body).injector().get('$filter')(col.cellFilter.slice(0, paramPos).trim());
+        var filterParam;
+        if (paramPos !== -1) {
+          filterParam = col.cellFilter.slice(paramPos + 1, 999).trim();
+          if (filterParam[0] === '\'' || filterParam[0] === '"') {
+            filterParam = filterParam.slice(1,-1);
+          }
+        }
+        filters[col.field] = {filter: filter, filterParam: filterParam };
+      }
+    };
 
     var container = document.querySelector('div.report-grow');
     if (container) {
@@ -371,20 +386,22 @@ function ngGridCsvExportPlugin(opts) {
 
   self.prepareCSV = function () {
 
-    function csvStringify(str) {
+    function csvStringify(str, filter) {
       if (str == null) { // we want to catch anything null-ish, hence just == not ===
         return '';
       }
-      if (typeof(str) === 'number') {
+      if (filter) {
+        return filter.filter(str, filter.filterParam);
+      }
+      if (typeof (str) === 'number') {
         return '' + str;
       }
-      if (typeof(str) === 'boolean') {
+      if (typeof (str) === 'boolean') {
         return (str ? 'TRUE' : 'FALSE');
       }
-      if (typeof(str) === 'string') {
+      if (typeof (str) === 'string') {
         return str.replace(/"/g, '""');
       }
-
       return JSON.stringify(str).replace(/"/g, '""');
     }
 
@@ -394,7 +411,9 @@ function ngGridCsvExportPlugin(opts) {
     }
 
     var csvData = '';
+    var filters = {};
     angular.forEach(self.grid.columns, function (col) {
+      self.scope.extractFilter(col, filters);
       if (col.visible && (col.width === undefined || col.width === '*' || col.width > 0)) {
         csvData += '"' + csvStringify(col.displayName) + '",';
       }
@@ -406,7 +425,7 @@ function ngGridCsvExportPlugin(opts) {
       if (row.visible) {
         angular.forEach(self.grid.columns, function (col) {
           if (col.visible) {
-            csvData += '"' + csvStringify(row.entity[col.field]) + '",';
+            csvData += '"' + csvStringify(row.entity[col.field], filters[col.field]) + '",';
           }
         });
         csvData = swapLastCommaForNewline(csvData);
@@ -458,7 +477,8 @@ function ngGridPdfExportPlugin(options) {
     var headers = [],
         headerNames = [],
         footers = [],
-        data = [];
+        data = [],
+        filters = {};
 
     angular.forEach(self.grid.columns, function (col) {
       if (col.visible) {
@@ -468,13 +488,18 @@ function ngGridPdfExportPlugin(options) {
       if (col.colDef.totalsRow) {
         footers[col.field] = self.grid.getTotalVal(col.field, col.filter).toString();
       }
+      self.scope.extractFilter(col, filters);
     });
 
     angular.forEach(self.grid.rows, function (row) {
       var output = [];
       if (row.visible) {
         headerNames.forEach(function(h) {
-          output.push(row.entity[h]);
+          var val = row.entity[h];
+          if (filters[h]) {
+            val = filters[h].filter(val, filters[h].filterParam);
+          }
+          output.push(val);
         });
         data.push(output);
       }
