@@ -111,15 +111,19 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$s
 
     $scope.extractFilter = function(col, filters) {
       if (col.cellFilter) {
-        var paramPos = col.cellFilter.indexOf(':');
-        var filter = angular.element(document.body).injector().get('$filter')(col.cellFilter.slice(0, paramPos).trim());
+        var filterName;
         var filterParam;
-        if (paramPos !== -1) {
+        var paramPos = col.cellFilter.indexOf(':');
+        if (paramPos === -1) {
+          filterName = col.cellFilter;
+        } else {
+          filterName = col.cellFilter.slice(0, paramPos).trim();
           filterParam = col.cellFilter.slice(paramPos + 1, 999).trim();
           if (filterParam[0] === '\'' || filterParam[0] === '"') {
             filterParam = filterParam.slice(1,-1);
           }
         }
+        var filter = angular.element(document.body).injector().get('$filter')(filterName.trim());
         filters[col.field] = {filter: filter, filterParam: filterParam };
       }
     };
