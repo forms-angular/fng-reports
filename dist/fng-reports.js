@@ -1,4 +1,4 @@
-/*! forms-angular 2020-09-07 */
+/*! forms-angular 2020-09-08 */
 'use strict';
 
 formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$scope', '$http', '$location', 'cssFrameworkService', 'routingService',
@@ -165,17 +165,17 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$s
           });
         }
 
-        var apiCall = '/api/report/' + $scope.modelName,
-            connector = '?';
+        var apiCall = '/api/report/' + $scope.modelName;
+        var connector = '?';
+        var haveUrlParams = false;
+        var query = $location.$$url.match(/\?.*/);
+
         if ($scope.reportSchemaName) {
           apiCall += '/' + $scope.reportSchemaName;
-        } else {
-          // take params of the URL
-          var query = $location.$$url.match(/\?.*/);
-          if (query) {
-            apiCall += connector + query[0].slice(1);
-            connector = '&';
-          }
+        } else if (query) {
+          apiCall += connector + query[0].slice(1);
+          connector = '&';
+          haveUrlParams = true;
         }
 
         if ($scope.paramSchema) {
@@ -195,6 +195,11 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$s
                 return;
               }
             }
+          }
+        } else {
+          if (!haveUrlParams && query) {
+            apiCall += connector + query[0].slice(1);
+            connector = '&';
           }
         }
         return $http.get(apiCall).then(function (response) {
@@ -295,7 +300,7 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$s
           }
         }, function (response) {
           console.log(JSON.stringify(response));
-          $location.path('/404');
+          $location.url('/404');
         });
       };
 
