@@ -14,11 +14,17 @@ export interface IColumnDef {
     cellTemplate?: string;
 }
 
+export interface IMenuOption {
+    text: string;
+    url: string;
+}
+
 export interface IReportSchema {
     pipeline: any;
     title?: string;
     drilldown?: string;
     params?: any;
-    columnDefs?: IColumnDef[],
+    columnDefs?: IColumnDef[];
     filter?: boolean;
+    menu? : IMenuOption[];
 }
