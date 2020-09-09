@@ -1,4 +1,4 @@
-/*! forms-angular 2020-09-08 */
+/*! forms-angular 2020-09-09 */
 'use strict';
 
 formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$scope', '$http', '$location', 'cssFrameworkService', 'routingService',
@@ -61,7 +61,7 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$s
 
 
     if (!$scope.reportSchemaName && $location.$$search.r) {
-      switch ($location.$$search.r.trim().slice(0, 1)) {
+      switch ($location.$$search.r.slice(0, 1)) {
         case '[' :
           $scope.reportSchema.pipeline = JSON.parse($location.$$search.r);
           break;
