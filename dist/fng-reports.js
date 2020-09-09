@@ -61,7 +61,7 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$s
 
 
     if (!$scope.reportSchemaName && $location.$$search.r) {
-      switch ($location.$$search.r.slice(0, 1)) {
+      switch ($location.$$search.r.trim().slice(0, 1)) {
         case '[' :
           $scope.reportSchema.pipeline = JSON.parse($location.$$search.r);
           break;
