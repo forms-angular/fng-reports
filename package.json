@@ -18,7 +18,7 @@
     "url": "https://github.com/forms-angular/fng-reports/issues"
   },
   "dependencies": {
-    "angular-ui-grid": "4.8.3",
+    "angular-ui-grid": "4.8.5",
     "jquery": "^3.5.1",
     "jspdf": "1.5.3",
     "jspdf-autotable": "^3.5.12"
