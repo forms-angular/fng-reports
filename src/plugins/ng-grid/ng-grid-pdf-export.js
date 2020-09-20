@@ -42,8 +42,8 @@ function ngGridPdfExportPlugin(options) {
         data = [],
         filters = {};
 
-    angular.forEach(self.grid.columns, function (col) {
-      if (col.visible) {
+    angular.forEach(self.grid.columns, function (col, index) {
+      if (col.visible && !col.colDef.cellTemplate) {
         headers.push(col.displayName);
         headerNames.push(col.field);
       }
@@ -68,7 +68,7 @@ function ngGridPdfExportPlugin(options) {
     });
 
     // var doc = new jsPDF('landscape', 'mm', 'a4');
-    var doc = new jsPDF('landscape', 'mm', 'a4');
+    var doc = new jspdf.jsPDF('landscape', 'mm', 'a4');
     doc.autoTable({
       head: [headers],
       body: data

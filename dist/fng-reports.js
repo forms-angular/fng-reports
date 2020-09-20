@@ -1,4 +1,4 @@
-/*! forms-angular 2020-09-15 */
+/*! forms-angular 2020-09-20 */
 'use strict';
 
 formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$scope', '$http', '$location', 'cssFrameworkService', 'routingService',
@@ -423,7 +423,7 @@ function ngGridCsvExportPlugin(opts) {
     var filters = {};
     angular.forEach(self.grid.columns, function (col) {
       self.scope.extractFilter(col, filters);
-      if (col.visible && (col.width === undefined || col.width === '*' || col.width > 0)) {
+      if (col.visible &&  !col.colDef.cellTemplate && (col.width === undefined || col.width === '*' || col.width > 0)) {
         csvData += '"' + csvStringify(col.displayName) + '",';
       }
     });
@@ -489,8 +489,8 @@ function ngGridPdfExportPlugin(options) {
         data = [],
         filters = {};
 
-    angular.forEach(self.grid.columns, function (col) {
-      if (col.visible) {
+    angular.forEach(self.grid.columns, function (col, index) {
+      if (col.visible && !col.colDef.cellTemplate) {
         headers.push(col.displayName);
         headerNames.push(col.field);
       }
@@ -515,7 +515,7 @@ function ngGridPdfExportPlugin(options) {
     });
 
     // var doc = new jsPDF('landscape', 'mm', 'a4');
-    var doc = new jsPDF('landscape', 'mm', 'a4');
+    var doc = new jspdf.jsPDF('landscape', 'mm', 'a4');
     doc.autoTable({
       head: [headers],
       body: data

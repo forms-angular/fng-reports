@@ -55,7 +55,7 @@ function ngGridCsvExportPlugin(opts) {
     var filters = {};
     angular.forEach(self.grid.columns, function (col) {
       self.scope.extractFilter(col, filters);
-      if (col.visible && (col.width === undefined || col.width === '*' || col.width > 0)) {
+      if (col.visible &&  !col.colDef.cellTemplate && (col.width === undefined || col.width === '*' || col.width > 0)) {
         csvData += '"' + csvStringify(col.displayName) + '",';
       }
     });

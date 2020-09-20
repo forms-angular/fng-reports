@@ -20,8 +20,8 @@
   "dependencies": {
     "angular-ui-grid": "4.8.5",
     "jquery": "^3.5.1",
-    "jspdf": "1.5.3",
-    "jspdf-autotable": "^3.5.12"
+    "jspdf": "2.1.1",
+    "jspdf-autotable": "^3.5.13"
   },
   "devDependencies": {
     "angular": "^1.8.0",
