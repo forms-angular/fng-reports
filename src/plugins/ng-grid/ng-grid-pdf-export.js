@@ -53,7 +53,7 @@ function ngGridPdfExportPlugin(options) {
       self.scope.extractFilter(col, filters);
     });
 
-    angular.forEach(self.grid.rows, function (row) {
+    angular.forEach(self.scope.gridApi.core.getVisibleRows(), function (row) {
       var output = [];
       if (row.visible) {
         headerNames.forEach(function(h) {

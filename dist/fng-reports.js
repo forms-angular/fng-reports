@@ -1,4 +1,4 @@
-/*! forms-angular 2020-09-20 */
+/*! forms-angular 2020-10-08 */
 'use strict';
 
 formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$scope', '$http', '$location', 'cssFrameworkService', 'routingService',
@@ -430,7 +430,7 @@ function ngGridCsvExportPlugin(opts) {
 
     csvData = swapLastCommaForNewline(csvData);
 
-    angular.forEach(self.grid.rows, function (row) {
+    angular.forEach(self.scope.gridApi.core.getVisibleRows(), function (row) {
       if (row.visible) {
         angular.forEach(self.grid.columns, function (col) {
           if (col.visible) {
@@ -500,7 +500,7 @@ function ngGridPdfExportPlugin(options) {
       self.scope.extractFilter(col, filters);
     });
 
-    angular.forEach(self.grid.rows, function (row) {
+    angular.forEach(self.scope.gridApi.core.getVisibleRows(), function (row) {
       var output = [];
       if (row.visible) {
         headerNames.forEach(function(h) {

@@ -62,7 +62,7 @@ function ngGridCsvExportPlugin(opts) {
 
     csvData = swapLastCommaForNewline(csvData);
 
-    angular.forEach(self.grid.rows, function (row) {
+    angular.forEach(self.scope.gridApi.core.getVisibleRows(), function (row) {
       if (row.visible) {
         angular.forEach(self.grid.columns, function (col) {
           if (col.visible) {
