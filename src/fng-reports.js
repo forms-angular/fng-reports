@@ -306,6 +306,12 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$s
       $scope.refreshQuery();
     }
 
+    // Check whether a cell template shows the content (in which case we want to output it) or does something funky
+    // (for example displays an image)
+    $scope.showsContent = function(template) {
+      return /{{[\s]*COL_FIELD[\s]*}}/.test(template.replace(/(<([^>]+)>)/gi, ''));
+    };
+
     $scope.$on('$locationChangeStart', function() {
       delete navScope.contextMenu;
       delete navScope.items;

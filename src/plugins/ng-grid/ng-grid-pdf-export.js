@@ -43,7 +43,7 @@ function ngGridPdfExportPlugin(options) {
         filters = {};
 
     angular.forEach(self.grid.columns, function (col, index) {
-      if (col.visible && !col.colDef.cellTemplate) {
+      if (col.visible && (!col.colDef.cellTemplate || self.scope.showsContent(col.colDef.cellTemplate))) {
         headers.push(col.displayName);
         headerNames.push(col.field);
       }

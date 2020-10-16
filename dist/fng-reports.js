@@ -1,4 +1,4 @@
-/*! forms-angular 2020-10-08 */
+/*! forms-angular 2020-10-16 */
 'use strict';
 
 formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$scope', '$http', '$location', 'cssFrameworkService', 'routingService',
@@ -307,6 +307,12 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$s
       $scope.refreshQuery();
     }
 
+    // Check whether a cell template shows the content (in which case we want to output it) or does something funky
+    // (for example displays an image)
+    $scope.showsContent = function(template) {
+      return /{{[\s]*COL_FIELD[\s]*}}/.test(template.replace(/(<([^>]+)>)/gi, ''));
+    };
+
     $scope.$on('$locationChangeStart', function() {
       delete navScope.contextMenu;
       delete navScope.items;
@@ -423,7 +429,9 @@ function ngGridCsvExportPlugin(opts) {
     var filters = {};
     angular.forEach(self.grid.columns, function (col) {
       self.scope.extractFilter(col, filters);
-      if (col.visible &&  !col.colDef.cellTemplate && (col.width === undefined || col.width === '*' || col.width > 0)) {
+      if (col.visible &&
+          (!col.colDef.cellTemplate || self.scope.showsContent(col.colDef.cellTemplate)) &&
+          (col.width === undefined || col.width === '*' || col.width > 0)) {
         csvData += '"' + csvStringify(col.displayName) + '",';
       }
     });
@@ -490,7 +498,7 @@ function ngGridPdfExportPlugin(options) {
         filters = {};
 
     angular.forEach(self.grid.columns, function (col, index) {
-      if (col.visible && !col.colDef.cellTemplate) {
+      if (col.visible && (!col.colDef.cellTemplate || self.scope.showsContent(col.colDef.cellTemplate))) {
         headers.push(col.displayName);
         headerNames.push(col.field);
       }
