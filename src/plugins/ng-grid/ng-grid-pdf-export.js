@@ -61,6 +61,17 @@ function ngGridPdfExportPlugin(options) {
           if (filters[h]) {
             val = filters[h].filter(val, filters[h].filterParam);
           }
+          if (typeof val === 'string') {
+            // chars > 255 cause BOM characters - see https://reallycare.freshdesk.com/a/tickets/2370
+            // first replace the predictable chars
+            val = val.replace(/\u2019/g,'\'');
+            val = val.replace(/\u2018/g,'\'');
+            val = val.replace(/\u201c/g,'"');
+            val = val.replace(/\u201d/g,'"');
+
+            // Then strip out anything left over 255
+            val = val.replace(/[^\x00-\xFF]/g, '');
+          }
           output.push(val);
         });
         data.push(output);
