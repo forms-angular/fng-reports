@@ -1,5 +1,4 @@
-cd ..
-code {
+{
   "name": "fng-reports",
   "version": "0.12.0-beta.121",
   "description": "Reporting plugin for forms-angular",
