@@ -1,4 +1,4 @@
-/*! forms-angular 2021-04-30 */
+/*! forms-angular 2021-06-05 */
 'use strict';
 
 formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$scope', '$http', '$location', 'cssFrameworkService', 'routingService',
@@ -44,6 +44,8 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$s
                   $scope.param = $scope.record[isParamTest[1]];
                   if (instructions.conversionExpression) {
                     return $scope.$eval(instructions.conversionExpression);
+                  } else {
+                    return instructions.value;
                   }
                 } else {
                   return $scope.reportSchema.params[isParamTest[1]].value;
