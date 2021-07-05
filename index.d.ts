@@ -23,6 +23,8 @@ declare namespace fngReports {
     export interface IReportParam {
         type: any;
         value?: any;
+        noInput?: boolean;
+        size?: string;    // should be fng.FieldSizeString;
         add?: string;
         conversionExpression?: any;
     }
