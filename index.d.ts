@@ -20,11 +20,22 @@ declare namespace fngReports {
         url: string;
     }
 
+    export interface IReportParam {
+        type: any;
+        value?: any;
+        add?: string;
+        conversionExpression?: any;
+    }
+
+    export interface IReportParams {
+        [name: string]: IReportParam;
+    }
+
     export interface IReportSchema {
         pipeline: any;
         title?: string;
         drilldown?: string;
-        params?: any;
+        params?: IReportParams;
         columnDefs?: IColumnDef[];
         filter?: boolean;
         menu?: IMenuOption[];
