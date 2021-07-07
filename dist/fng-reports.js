@@ -1,4 +1,4 @@
-/*! forms-angular 2021-07-05 */
+/*! forms-angular 2021-07-07 */
 'use strict';
 
 formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$scope', '$http', '$location', 'cssFrameworkService', 'routingService',
@@ -435,6 +435,9 @@ function ngGridCsvExportPlugin(opts) {
           (!col.colDef.cellTemplate || self.scope.showsContent(col.colDef.cellTemplate)) &&
           (col.width === undefined || col.width === '*' || col.width > 0)) {
         csvData += '"' + csvStringify(col.displayName) + '",';
+        col.doCSVExport = true;
+      } else {
+        col.doCSVExport = false;
       }
     });
 
@@ -443,7 +446,7 @@ function ngGridCsvExportPlugin(opts) {
     angular.forEach(self.scope.gridApi.core.getVisibleRows(), function (row) {
       if (row.visible) {
         angular.forEach(self.grid.columns, function (col) {
-          if (col.visible) {
+          if (col.doCSVExport) {
             csvData += '"' + csvStringify(row.entity[col.field], filters[col.field]) + '",';
           }
         });
