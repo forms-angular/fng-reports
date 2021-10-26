@@ -12,6 +12,9 @@
     "angular",
     "reporting"
   ],
+  "scripts": {
+    "test": "grunt build"
+  },
   "author": "Mark Chapman <support@forms-angular.org>",
   "license": "MIT",
   "bugs": {
