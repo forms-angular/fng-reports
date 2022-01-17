@@ -3,7 +3,7 @@ declare namespace fngReports {
     export interface IColumnDef {
         name: string;
         field: string;
-        displayName: string;
+        displayName?: string;
         align?: string;
         cellFilter?: string;
         totalsRow?: string;

@@ -1,6 +1,6 @@
 {
   "name": "fng-reports",
-  "version": "0.12.0-beta.160",
+  "version": "0.12.0-beta.171",
   "description": "Reporting plugin for forms-angular",
   "repository": {
     "type": "git",
@@ -12,16 +12,19 @@
     "angular",
     "reporting"
   ],
+  "scripts": {
+    "test": "grunt build"
+  },
   "author": "Mark Chapman <support@forms-angular.org>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/forms-angular/fng-reports/issues"
   },
   "dependencies": {
-    "angular-ui-grid": "4.10.2",
+    "angular-ui-grid": "4.11.0",
     "jquery": "^3.6.0",
-    "jspdf": "2.3.1",
-    "jspdf-autotable": "^3.5.14"
+    "jspdf": "2.4.0",
+    "jspdf-autotable": "^3.5.23"
   },
   "devDependencies": {
     "angular": "^1.8.2",
@@ -29,14 +32,14 @@
     "angular-messages": "1.8.2",
     "angular-mocks": "1.8.2",
     "angular-sanitize": "1.8.2",
-    "forms-angular": "0.12.0-beta.160",
+    "forms-angular": "0.12.0-beta.171",
     "grunt": "^1.4.1",
     "grunt-autoprefixer": "3.0.4",
     "grunt-concurrent": "3.0.0",
     "grunt-contrib-clean": "2.0.0",
-    "grunt-contrib-concat": "1.0.1",
+    "grunt-contrib-concat": "2.0.0",
     "grunt-contrib-copy": "1.0.0",
-    "grunt-contrib-jshint": "3.0.0",
+    "grunt-contrib-jshint": "3.1.1",
     "grunt-contrib-uglify": "5.0.1",
     "grunt-contrib-watch": "^1.1.0",
     "grunt-karma": "4.0.2",
@@ -44,8 +47,8 @@
     "grunt-ng-annotate": "4.0.0",
     "grunt-rev": "0.1.0",
     "grunt-usemin": "github:mchapman/grunt-usemin",
-    "jasmine-core": "3.7.1",
-    "karma": "^6.3.4",
+    "jasmine-core": "3.10.1",
+    "karma": "^6.3.6",
     "karma-chrome-launcher": "3.1.0",
     "karma-jasmine": "4.0.1",
     "karma-junit-reporter": "2.0.1",
