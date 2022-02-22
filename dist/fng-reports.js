@@ -1,4 +1,4 @@
-/*! forms-angular 2022-01-22 */
+/*! forms-angular 2022-02-22 */
 'use strict';
 
 formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$scope', '$http', '$location', 'cssFrameworkService', 'routingService',
@@ -260,7 +260,6 @@ ${e.message}`);
                     }
                 }
                 return $http.get(apiCall).then(function (response) {
-                    console.log('back');
                     var data = response.data;
                     if (data.success) {
                         $scope.report = data.report;
@@ -326,8 +325,6 @@ ${e.message}`);
                     $location.url('/404');
                 });
             };
-
-            console.log('From the bottom');
 
             $scope.refreshQuery();
         }
