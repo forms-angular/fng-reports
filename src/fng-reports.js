@@ -259,8 +259,8 @@ ${e.message}`);
                     }
                 }
                 return $http.get(apiCall).then(function (response) {
-                    var data = response.data;
-                    if (data.success) {
+                    if (response && response.data && response.data.success) {
+                        var data = response.data;
                         $scope.report = data.report;
                         $scope.reportSchema = data.schema;
                         $scope.reportSchema.title = $scope.reportSchema.title || $scope.modelName;
@@ -316,12 +316,11 @@ ${e.message}`);
                             }
                         }
                     } else {
-                        console.log(JSON.stringify(data));
+                        $scope.showError(JSON.stringify(response.data.error), 'Invalid Response Error');
                         $scope.reportSchema.title = 'Error - see console log';
                     }
-                }, function (response) {
-                    console.log(JSON.stringify(response));
-                    $location.url('/404');
+                }, function () {
+                    $scope.showError('The server could not process the request', 'Error');
                 });
             };
 
@@ -338,5 +337,51 @@ ${e.message}`);
             delete navScope.contextMenu;
             delete navScope.items;
         });
+
+        // Error handling, stolen quickly from forms-angulat record-handler
+        $scope.showError = function(error, alertTitle) {
+            $scope.alertTitle = alertTitle ? alertTitle : 'Error!';
+            if (typeof error === 'string') {
+                $scope.errorMessage = error;
+            } else if (!error) {
+                $scope.errorMessage = `An error occurred - that's all we got.  Sorry.`;
+            } else if (error.message && typeof error.message === 'string') {
+                $scope.errorMessage = error.message;
+            } else if (error.data && error.data.message) {
+                $scope.errorMessage = error.data.message;
+            } else {
+                try {
+                    $scope.errorMessage = JSON.stringify(error);
+                } catch (e) {
+                    $scope.errorMessage = error;
+                }
+            }
+            $scope.errorHideTimer = window.setTimeout(function() {
+                $scope.dismissError();
+                $scope.$digest();
+            }, 3500 + (1000 * ($scope.alertTitle + $scope.errorMessage).length / 50));
+            $scope.errorVisible = true;
+            window.setTimeout(() => {
+                $scope.$digest();
+            });
+        };
+
+        $scope.clearTimeout = function() {
+            if ($scope.errorHideTimer) {
+                clearTimeout($scope.errorHideTimer);
+                delete $scope.errorHideTimer;
+            }
+        };
+
+        $scope.dismissError = function() {
+            $scope.clearTimeout;
+            $scope.errorVisible = false;
+            delete $scope.errorMessage;
+            delete $scope.alertTitle;
+        };
+
+        $scope.stickError = function() {
+            clearTimeout($scope.errorHideTimer);
+        };
 
     }]);
