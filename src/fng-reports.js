@@ -36,26 +36,30 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$s
                 gridApi.selection.on.rowSelectionChanged($scope, function afterSelectionChange(rowItem) {
                     var url = $scope.reportSchema.drilldown;
                     if (url) {
-                        url = routingService.buildUrl(url.replace(/\|.+?\|/g, function (match) {
-                            var param = match.slice(1, -1),
-                                isParamTest = /\((.+)\)/.exec(param);
-                            if (isParamTest) {
-                                var instructions = $scope.reportSchema.params[isParamTest[1]];
-                                if (instructions) {
-                                    $scope.param = $scope.record[isParamTest[1]];
-                                    if (instructions.conversionExpression) {
-                                        return $scope.$eval(instructions.conversionExpression);
+                        if (typeof url === 'string') {
+                            url = routingService.buildUrl(url.replace(/\|.+?\|/g, function (match) {
+                                var param = match.slice(1, -1),
+                                    isParamTest = /\((.+)\)/.exec(param);
+                                if (isParamTest) {
+                                    var instructions = $scope.reportSchema.params[isParamTest[1]];
+                                    if (instructions) {
+                                        $scope.param = $scope.record[isParamTest[1]];
+                                        if (instructions.conversionExpression) {
+                                            return $scope.$eval(instructions.conversionExpression);
+                                        } else {
+                                            return instructions.value;
+                                        }
                                     } else {
-                                        return instructions.value;
+                                        return $scope.reportSchema.params[isParamTest[1]].value;
                                     }
                                 } else {
-                                    return $scope.reportSchema.params[isParamTest[1]].value;
+                                    return rowItem.entity[param];
                                 }
-                            } else {
-                                return rowItem.entity[param];
-                            }
-                        }));
-                        window.location = url;
+                            }));
+                            window.location = url;
+                        } else {
+                            console.error('Was expecting drilldown to be string but it was ' + typeof url + ' (' + url + ')'); // trying to track down Sentry 3037641567
+                        }
                     }
                 });
             },
