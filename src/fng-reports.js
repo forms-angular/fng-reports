@@ -177,7 +177,6 @@ ${e.message}`);
             }
             $scope.$watch('record', function (newValue, oldValue) {
                 if (oldValue !== newValue) {
-                    console.log('In the record watch ', JSON.stringify(newValue, null, 2));
                     $scope.refreshQuery();
                 }
             }, true);
