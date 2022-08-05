@@ -332,8 +332,12 @@ ${e.message}`);
 
         // Check whether a cell template shows the content (in which case we want to output it) or does something funky
         // (for example displays an image)
-        $scope.showsContent = function (template) {
-            return /{{[\s]*COL_FIELD[\s]*}}/.test(template.replace(/(<([^>]+)>)/gi, ''));
+        $scope.showsContent = function (template, col) {
+            if (/{{[\s]*COL_FIELD[\s]*}}/.test(template.replace(/(<([^>]+)>)/gi, ''))) {
+                return true;
+            } else if (template.indexOf('ng-bind-html="row.entity.' + col) !== -1) {
+                return 'HTML';
+            }
         };
 
         $scope.$on('$locationChangeStart', function () {

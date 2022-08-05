@@ -1,4 +1,4 @@
-/*! forms-angular 2022-06-03 */
+/*! forms-angular 2022-08-05 */
 'use strict';
 
 formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$scope', '$http', '$location', 'cssFrameworkService', 'routingService',
@@ -178,7 +178,6 @@ ${e.message}`);
             }
             $scope.$watch('record', function (newValue, oldValue) {
                 if (oldValue !== newValue) {
-                    console.log('In the record watch ', JSON.stringify(newValue, null, 2));
                     $scope.refreshQuery();
                 }
             }, true);
@@ -334,8 +333,12 @@ ${e.message}`);
 
         // Check whether a cell template shows the content (in which case we want to output it) or does something funky
         // (for example displays an image)
-        $scope.showsContent = function (template) {
-            return /{{[\s]*COL_FIELD[\s]*}}/.test(template.replace(/(<([^>]+)>)/gi, ''));
+        $scope.showsContent = function (template, col) {
+            if (/{{[\s]*COL_FIELD[\s]*}}/.test(template.replace(/(<([^>]+)>)/gi, ''))) {
+                return true;
+            } else if (template.indexOf('ng-bind-html="row.entity.' + col) !== -1) {
+                return 'HTML';
+            }
         };
 
         $scope.$on('$locationChangeStart', function () {
@@ -500,13 +503,31 @@ function ngGridCsvExportPlugin(opts) {
     var filters = {};
     angular.forEach(self.grid.columns, function (col) {
       self.scope.extractFilter(col, filters);
-      if (col.visible &&
-          (!col.colDef.cellTemplate || self.scope.showsContent(col.colDef.cellTemplate)) &&
-          (col.width === undefined || col.width === '*' || col.width > 0)) {
-        csvData += '"' + csvStringify(col.displayName) + '",';
-        col.doCSVExport = true;
-      } else {
-        col.doCSVExport = false;
+      if (col.visible && (col.width === undefined || col.width === '*' || col.width > 0)) {
+        if (!col.colDef.cellTemplate) {
+          csvData += '"' + csvStringify(col.displayName) + '",';
+          col.doCSVExport = true;
+        } else {
+            const templateResp = self.scope.showsContent(col.colDef.cellTemplate, col.field);
+            if (templateResp === 'HTML') {
+                csvData += '"' + csvStringify(col.displayName) + '",';
+                col.doCSVExport = function (value) {
+                  value = value.replace(/<p>/g, '\n\n');
+                  value = value.replace(/<\/p>/g, '');
+                  value = value.replace(/<\s?br\s?\/?>/g, '\n');
+                  value = value.replace(/<[^>]+>/g, '');
+                  value = value.replaceAll('&nbsp;', ' ').trim();
+                  value = value.replaceAll('\n\n \n\n', '\n\n');
+                  value = value.replaceAll('\n\n\n', '\n\n');
+                  return value;
+                };
+            } else if (templateResp) {
+                csvData += '"' + csvStringify(col.displayName) + '",';
+                col.doCSVExport = true;
+            } else {
+                col.doCSVExport = false;
+            }
+        }
       }
     });
 
@@ -516,7 +537,11 @@ function ngGridCsvExportPlugin(opts) {
       if (row.visible) {
         angular.forEach(self.grid.columns, function (col) {
           if (col.doCSVExport) {
-            csvData += '"' + csvStringify(row.entity[col.field], filters[col.field]) + '",';
+            let value = row.entity[col.field];
+            if (typeof col.doCSVExport === 'function') {
+              value = col.doCSVExport(value);
+            }
+            csvData += '"' + csvStringify(value, filters[col.field]) + '",';
           }
         });
         csvData = swapLastCommaForNewline(csvData);
@@ -569,12 +594,35 @@ function ngGridPdfExportPlugin(options) {
         headerNames = [],
         footers = [],
         data = [],
-        filters = {};
+        filters = {},
+        transformers = {};
+
 
     angular.forEach(self.grid.columns, function (col, index) {
-      if (col.visible && (!col.colDef.cellTemplate || self.scope.showsContent(col.colDef.cellTemplate))) {
-        headers.push(col.displayName);
-        headerNames.push(col.field);
+      if (col.visible) {
+        if (!col.colDef.cellTemplate) {
+          headers.push(col.displayName);
+          headerNames.push(col.field);
+        } else {
+          const templateResp = self.scope.showsContent(col.colDef.cellTemplate, col.field);
+          if (templateResp === 'HTML') {
+            headers.push(col.displayName);
+            headerNames.push(col.field);
+            transformers[col.field] = function (value) {
+              value = value.replace(/<p>/g, '\n\n');
+              value = value.replace(/<\/p>/g, '');
+              value = value.replace(/<\s?br\s?\/?>/g, '\n');
+              value = value.replace(/<[^>]+>/g, '');
+              value = value.replaceAll('&nbsp;', ' ').trim();
+              value = value.replaceAll('\n\n \n\n', '\n\n');
+              value = value.replaceAll('\n\n\n', '\n\n');
+              return value;
+            };
+          } else if (templateResp) {
+            headers.push(col.displayName);
+            headerNames.push(col.field);
+          }
+        }
       }
       if (col.colDef.totalsRow) {
         footers[col.field] = self.grid.getTotalVal(col.field, col.filter).toString();
@@ -589,6 +637,9 @@ function ngGridPdfExportPlugin(options) {
           var val = row.entity[h];
           if (filters[h]) {
             val = filters[h].filter(val, filters[h].filterParam);
+          }
+          if (transformers[h]) {
+            val = transformers[h](val);
           }
           if (typeof val === 'string') {
             // chars > 255 cause BOM characters - see https://reallycare.freshdesk.com/a/tickets/2370
