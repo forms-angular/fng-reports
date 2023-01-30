@@ -505,7 +505,7 @@ function ngGridCsvExportPlugin(opts) {
       self.scope.extractFilter(col, filters);
       if (col.visible && (col.width === undefined || col.width === '*' || col.width > 0)) {
         if (col.field.indexOf('.') !== -1) {
-          console.error(`Cannot export nested fields such as ${col.field}`);
+          console.error(`Cannot export nested fields such as ${col.field}.  Use $project to simplify.`);
         } else {
           if (!col.colDef.cellTemplate) {
             csvData += '"' + csvStringify(col.displayName) + '",';
@@ -605,7 +605,7 @@ function ngGridPdfExportPlugin(options) {
     angular.forEach(self.grid.columns, function (col, index) {
       if (col.visible) {
         if (col.field.indexOf('.') !== -1) {
-          console.error(`Cannot export nested fields such as ${col.field}`);
+          console.error(`Cannot export nested fields such as ${col.field}.  Use $project to simplify.`);
         } else {
           if (!col.colDef.cellTemplate) {
             headers.push(col.displayName);
