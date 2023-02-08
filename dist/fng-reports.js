@@ -1,4 +1,4 @@
-/*! forms-angular 2023-01-30 */
+/*! forms-angular 2023-02-07 */
 'use strict';
 
 formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$scope', '$http', '$location', 'cssFrameworkService', 'routingService',
@@ -171,7 +171,7 @@ ${e.message}`);
                     }
                     var dateTest = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3})(Z|[+ -]\d{4})$/.exec(thisPart.value);
                     if (dateTest) {
-                        thisPart.value = new Date(thisPart.value);
+                        thisPart.value = new Date(dateTest[1]);
                     }
                     $scope.record[param] = thisPart.value;
                 }
