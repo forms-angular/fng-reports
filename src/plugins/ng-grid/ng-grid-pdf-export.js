@@ -46,27 +46,31 @@ function ngGridPdfExportPlugin(options) {
 
     angular.forEach(self.grid.columns, function (col, index) {
       if (col.visible) {
-        if (!col.colDef.cellTemplate) {
-          headers.push(col.displayName);
-          headerNames.push(col.field);
+        if (col.field.indexOf('.') !== -1) {
+          console.error(`Cannot export nested fields such as ${col.field}.  Use $project to simplify.`);
         } else {
-          const templateResp = self.scope.showsContent(col.colDef.cellTemplate, col.field);
-          if (templateResp === 'HTML') {
+          if (!col.colDef.cellTemplate) {
             headers.push(col.displayName);
             headerNames.push(col.field);
-            transformers[col.field] = function (value) {
-              value = value.replace(/<p>/g, '\n\n');
-              value = value.replace(/<\/p>/g, '');
-              value = value.replace(/<\s?br\s?\/?>/g, '\n');
-              value = value.replace(/<[^>]+>/g, '');
-              value = value.replaceAll('&nbsp;', ' ').trim();
-              value = value.replaceAll('\n\n \n\n', '\n\n');
-              value = value.replaceAll('\n\n\n', '\n\n');
-              return value;
-            };
-          } else if (templateResp) {
-            headers.push(col.displayName);
-            headerNames.push(col.field);
+          } else {
+            const templateResp = self.scope.showsContent(col.colDef.cellTemplate, col.field);
+            if (templateResp === 'HTML') {
+              headers.push(col.displayName);
+              headerNames.push(col.field);
+              transformers[col.field] = function (value) {
+                value = value.replace(/<p>/g, '\n\n');
+                value = value.replace(/<\/p>/g, '');
+                value = value.replace(/<\s?br\s?\/?>/g, '\n');
+                value = value.replace(/<[^>]+>/g, '');
+                value = value.replaceAll('&nbsp;', ' ').trim();
+                value = value.replaceAll('\n\n \n\n', '\n\n');
+                value = value.replaceAll('\n\n\n', '\n\n');
+                return value;
+              };
+            } else if (templateResp) {
+              headers.push(col.displayName);
+              headerNames.push(col.field);
+            }
           }
         }
       }

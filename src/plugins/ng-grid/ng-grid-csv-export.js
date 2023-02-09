@@ -56,29 +56,33 @@ function ngGridCsvExportPlugin(opts) {
     angular.forEach(self.grid.columns, function (col) {
       self.scope.extractFilter(col, filters);
       if (col.visible && (col.width === undefined || col.width === '*' || col.width > 0)) {
-        if (!col.colDef.cellTemplate) {
-          csvData += '"' + csvStringify(col.displayName) + '",';
-          col.doCSVExport = true;
+        if (col.field.indexOf('.') !== -1) {
+          console.error(`Cannot export nested fields such as ${col.field}.  Use $project to simplify.`);
         } else {
+          if (!col.colDef.cellTemplate) {
+            csvData += '"' + csvStringify(col.displayName) + '",';
+            col.doCSVExport = true;
+          } else {
             const templateResp = self.scope.showsContent(col.colDef.cellTemplate, col.field);
             if (templateResp === 'HTML') {
-                csvData += '"' + csvStringify(col.displayName) + '",';
-                col.doCSVExport = function (value) {
-                  value = value.replace(/<p>/g, '\n\n');
-                  value = value.replace(/<\/p>/g, '');
-                  value = value.replace(/<\s?br\s?\/?>/g, '\n');
-                  value = value.replace(/<[^>]+>/g, '');
-                  value = value.replaceAll('&nbsp;', ' ').trim();
-                  value = value.replaceAll('\n\n \n\n', '\n\n');
-                  value = value.replaceAll('\n\n\n', '\n\n');
-                  return value;
-                };
+              csvData += '"' + csvStringify(col.displayName) + '",';
+              col.doCSVExport = function (value) {
+                value = value.replace(/<p>/g, '\n\n');
+                value = value.replace(/<\/p>/g, '');
+                value = value.replace(/<\s?br\s?\/?>/g, '\n');
+                value = value.replace(/<[^>]+>/g, '');
+                value = value.replaceAll('&nbsp;', ' ').trim();
+                value = value.replaceAll('\n\n \n\n', '\n\n');
+                value = value.replaceAll('\n\n\n', '\n\n');
+                return value;
+              };
             } else if (templateResp) {
-                csvData += '"' + csvStringify(col.displayName) + '",';
-                col.doCSVExport = true;
+              csvData += '"' + csvStringify(col.displayName) + '",';
+              col.doCSVExport = true;
             } else {
-                col.doCSVExport = false;
+              col.doCSVExport = false;
             }
+          }
         }
       }
     });
