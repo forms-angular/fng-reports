@@ -323,8 +323,16 @@ ${e.message}`);
                         $scope.showError(JSON.stringify(response.data.error), 'Invalid Response Error');
                         $scope.reportSchema.title = 'Error - see console log';
                     }
-                }, function () {
-                    $scope.showError('The server could not process the request', 'Error');
+                }, function (error) {
+                    let body, title;
+                    if (error.status === 403) {
+                        body = 'You do not have permission to run this report (permission to GET all ' + $scope.modelName + ' records is required)';
+                        title = 'Permission denied';
+                    } else {
+                        body = 'The server could not process the request';
+                        title = 'Error';
+                    }
+                    $scope.showError(body, title);
                 });
             };
 
