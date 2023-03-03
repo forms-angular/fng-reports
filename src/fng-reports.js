@@ -204,6 +204,7 @@ ${e.message}`);
             }
         ];
         navScope.contextMenu = 'Report';
+        navScope.contextMenuId = 'reportMenu';
         $scope.titleWithSubstitutions = $scope.reportSchema.title;
 
 //  inhibitRefresh can be set by a controller, for example if report data is being provided as part of the URL
