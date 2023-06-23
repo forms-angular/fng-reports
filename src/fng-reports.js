@@ -63,6 +63,30 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$s
                     }
                 });
             },
+            appScopeProvider: {
+                /*
+                * This allows us to make an arbitrary http request from a cell template. Example:
+                * <div class="ui-grid-cell-contents">
+                *   <span class="glyphicon glyphicon-remove"
+                *             data-ng-click="grid.appScope.http($event, 'GET', '/apix/queue/cancel/:id')" data-id="{{COL_FIELD}}">
+                *   </span>
+                * </div>
+                * The value of any attribute beginning with data will replace the corresponding :attribute in the url,
+                * so in this case the :id in the url will be replaced by the value of the data-id attribute.
+                */
+                http: function ($event, method, url) {
+                    $event.target.getAttributeNames().forEach(a => {
+                        if (a.startsWith('data-')) {
+                            url = url.replace(`:${a.slice(5)}`, $event.target.getAttribute(a));
+                        }
+                    });
+                    $http({
+                        method: method,
+                        url: url,
+                    });
+                    $event.stopPropagation();
+                }
+            }
         };
         $scope.report = [];
 
