@@ -1,4 +1,4 @@
-/*! forms-angular 2023-06-23 */
+/*! forms-angular 2023-06-24 */
 'use strict';
 
 formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$scope', '$http', '$location', 'cssFrameworkService', 'routingService',
@@ -68,19 +68,22 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$s
                 /*
                 * This allows us to make an arbitrary http request from a cell template. Example:
                 * <div class="ui-grid-cell-contents">
-                *   <span class="glyphicon glyphicon-remove"
-                *             data-ng-click="grid.appScope.http($event, 'GET', '/apix/queue/cancel/:id')" data-id="{{COL_FIELD}}">
-                *   </span>
+                *   <button class="btn btn-small" data-ng-click="grid.appScope.http($event, 'GET', '/apix/queue/cancel/:id')" data-id="{{COL_FIELD}}" data-disable-button="true">
+                *     <span class="glyphicon glyphicon-remove"></span> Cancel
+                *   </button>
                 * </div>
                 * The value of any attribute beginning with data will replace the corresponding :attribute in the url,
                 * so in this case the :id in the url will be replaced by the value of the data-id attribute.
                 */
                 http: function ($event, method, url) {
-                    $event.target.getAttributeNames().forEach(a => {
+                    $event.currentTarget.getAttributeNames().forEach(a => {
                         if (a.startsWith('data-')) {
-                            url = url.replace(`:${a.slice(5)}`, $event.target.getAttribute(a));
+                            url = url.replace(`:${a.slice(5)}`, $event.currentTarget.getAttribute(a));
                         }
                     });
+                    if ($event.currentTarget.getAttribute('data-disable-button') === 'true') {
+                        $event.currentTarget.setAttribute('disabled', 'disabled');
+                    }
                     $http({
                         method: method,
                         url: url,
