@@ -26,14 +26,14 @@ describe('Reports', function () {
         ]});
         $rootScope.navScope = {};
         var scope = $rootScope.$new();
-        var routingService = {
+        var RoutingService = {
           parsePathFunc: function () {
             return function  () {
-              return {modelName: 'collection', reportSchemaName: 'myReport'}
+              return {modelName: 'collection', reportSchemaName: 'myReport'};
             };
           }
         };
-        $controller('AnalysisCtrl', {$scope: scope, routingService: routingService});
+        $controller('AnalysisCtrl', {$scope: scope, RoutingService: RoutingService});
         $httpBackend.flush();
         expect(scope.report.length).toBe(2);
       });

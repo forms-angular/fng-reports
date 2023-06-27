@@ -1,14 +1,14 @@
 'use strict';
 
-formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$scope', '$http', '$location', 'cssFrameworkService', 'routingService',
-    function ($rootScope, $window, $filter, $scope, $http, $location, cssFrameworkService, routingService) {
+formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$scope', '$http', '$location', 'CssFrameworkService', 'RoutingService',
+    function ($rootScope, $window, $filter, $scope, $http, $location, CssFrameworkService, RoutingService) {
         /*jshint newcap: false */
         var firstTime = true,
             pdfPlugIn = new ngGridPdfExportPlugin({inhibitButton: true}),
             csvPlugIn = new ngGridCsvExportPlugin({inhibitButton: true});
         /*jshint newcap: true */
 
-        angular.extend($scope, routingService.parsePathFunc()($location.$$path));
+        angular.extend($scope, RoutingService.parsePathFunc()($location.$$path));
 
         $scope.reportSchema = {
             columnDefs: []
@@ -37,7 +37,7 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$s
                     var url = $scope.reportSchema.drilldown;
                     if (url) {
                         if (typeof url === 'string') {
-                            url = routingService.buildUrl(url.replace(/\|.+?\|/g, function (match) {
+                            url = RoutingService.buildUrl(url.replace(/\|.+?\|/g, function (match) {
                                 var param = match.slice(1, -1),
                                     isParamTest = /\((.+)\)/.exec(param);
                                 if (isParamTest) {
@@ -187,7 +187,7 @@ ${e.message}`);
                             type: thisPart.type || 'text',
                             required: true,
                             add: thisPart.add || undefined,
-                            size: thisPart.size || (cssFrameworkService.frameWork === 'bs3' ? 'large' : 'medium')
+                            size: thisPart.size || (CssFrameworkService.frameWork === 'bs3' ? 'large' : 'medium')
                         });
                         if (thisPart.type === 'select') {
                             // TODO: Remove when select and select2 is modified during the restructure
@@ -381,7 +381,7 @@ ${e.message}`);
             delete navScope.items;
         });
 
-        // Error handling, stolen quickly from forms-angulat record-handler
+        // Error handling, stolen quickly from forms-angular record-handler
         $scope.showError = function(error, alertTitle) {
             $scope.alertTitle = alertTitle ? alertTitle : 'Error!';
             if (typeof error === 'string') {
