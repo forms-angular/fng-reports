@@ -1,4 +1,4 @@
-/*! forms-angular 2023-06-24 */
+/*! forms-angular 2023-06-26 */
 'use strict';
 
 formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$scope', '$http', '$location', 'CssFrameworkService', 'RoutingService',
@@ -382,7 +382,7 @@ ${e.message}`);
             delete navScope.items;
         });
 
-        // Error handling, stolen quickly from forms-angulat record-handler
+        // Error handling, stolen quickly from forms-angular record-handler
         $scope.showError = function(error, alertTitle) {
             $scope.alertTitle = alertTitle ? alertTitle : 'Error!';
             if (typeof error === 'string') {
