@@ -1,4 +1,4 @@
-/*! forms-angular 2023-06-27 */
+/*! forms-angular 2023-09-01 */
 'use strict';
 
 formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$scope', '$http', '$location', 'CssFrameworkService', 'RoutingService',
@@ -65,29 +65,37 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$s
                 });
             },
             appScopeProvider: {
-                /*
-                * This allows us to make an arbitrary http request from a cell template. Example:
-                * <div class="ui-grid-cell-contents">
-                *   <button class="btn btn-small" data-ng-click="grid.appScope.http($event, 'GET', '/apix/queue/cancel/:id')" data-id="{{COL_FIELD}}" data-disable-button="true">
-                *     <span class="glyphicon glyphicon-remove"></span> Cancel
-                *   </button>
-                * </div>
-                * The value of any attribute beginning with data will replace the corresponding :attribute in the url,
-                * so in this case the :id in the url will be replaced by the value of the data-id attribute.
-                */
                 http: function ($event, method, url) {
+                    /*
+                    * This allows us to make an arbitrary http request from a cell template. Example:
+                    * <div class="ui-grid-cell-contents">
+                    *   <button class="btn btn-small" data-ng-click="grid.appScope.http($event, 'GET', '/apix/queue/cancel/:id')" data-id="{{COL_FIELD}}" data-disable-button="true">
+                    *     <span class="glyphicon glyphicon-remove"></span> Cancel
+                    *   </button>
+                    * </div>
+                    * The value of any attribute beginning with data will replace the corresponding :attribute in the url,
+                    * so in this case the :id in the url will be replaced by the value of the data-id attribute.
+                    */
                     $event.currentTarget.getAttributeNames().forEach(a => {
                         if (a.startsWith('data-')) {
                             url = url.replace(`:${a.slice(5)}`, $event.currentTarget.getAttribute(a));
                         }
                     });
-                    if ($event.currentTarget.getAttribute('data-disable-button') === 'true') {
+                    let disabledText = $event.currentTarget.getAttribute('data-disable-button');
+                    if (disabledText) {
                         $event.currentTarget.setAttribute('disabled', 'disabled');
+                        if (disabledText !== 'true') {
+                            $event.currentTarget.innerText = disabledText;
+                        }
                     }
-                    $http({
+                    var configObj = {
                         method: method,
                         url: url,
-                    });
+                    };
+                    if (['POST', 'PUT', 'PATCH'].indexOf(method) !== -1) {
+                        configObj.data = {val: $event.currentTarget.getAttribute('data-data') || {}};
+                    }
+                    $http(configObj);
                     $event.stopPropagation();
                 }
             }
