@@ -1,8 +1,8 @@
-/*! forms-angular 2023-09-01 */
+/*! forms-angular 2023-10-20 */
 'use strict';
 
-formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$filter', '$scope', '$http', '$location', 'CssFrameworkService', 'RoutingService',
-    function ($rootScope, $window, $filter, $scope, $http, $location, CssFrameworkService, RoutingService) {
+formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$q', '$filter', '$scope', '$http', '$location', 'CssFrameworkService', 'RoutingService',
+    function ($rootScope, $window, $q, $filter, $scope, $http, $location, CssFrameworkService, RoutingService) {
         /*jshint newcap: false */
         var firstTime = true,
             pdfPlugIn = new ngGridPdfExportPlugin({inhibitButton: true}),
@@ -206,7 +206,7 @@ ${e.message}`);
                     }
                     var dateTest = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3})(Z|[+ -]\d{4})$/.exec(thisPart.value);
                     if (dateTest) {
-                        thisPart.value = new Date(dateTest[1]);
+                        thisPart.value = new Date(dateTest[0]);
                     }
                     $scope.record[param] = thisPart.value;
                 }
@@ -249,10 +249,38 @@ ${e.message}`);
             $scope.refreshQuery = function () {
 
                 function substituteParams(str) {
-                    return str.replace(/\|.+?\|/g, function (match) {
-                        var param = match.slice(1, -1);
-                        var isParamTest = /\((.+)\)/.exec(param);
-                        return isParamTest ? $scope.reportSchema.params[isParamTest[1]].value : '';
+                    return $q(function (resolve) {
+                        let promises = [];
+                        str.replace(/\|.+?\|/g, function (match) {
+                            var param = match.slice(1, -1);
+                            var isParamTest = /\((.+)\)/.exec(param);
+                            if (isParamTest[1]) {
+                                const paramValue = $scope.reportSchema.params[isParamTest[1]].value;
+                                if (isParamTest.index > 0) {
+                                    // We have a title function to run
+                                    promises.push($http.get(`/api/${'organisation'}/${paramValue}/list`).then(function (response) {
+                                        if (response && response.status === 200 && response.data) {
+                                            return response.data.list;
+                                        } else {
+                                            return '';
+                                        }
+                                    }));
+                                } else {
+                                    promises.push(paramValue);
+                                }
+                            } else {
+                                promises.push('');
+                            }
+                            return match;
+                        });
+                        Promise.all(promises).then(function (results) {
+                            let index = 0;
+                            resolve(str.replace(/\|.+?\|/g, function () {
+                                let retVal = results[index];
+                                index += 1;
+                                return retVal;
+                            }));
+                        });
                     });
                 }
 
@@ -304,13 +332,18 @@ ${e.message}`);
                         $scope.report = data.report;
                         $scope.reportSchema = data.schema;
                         $scope.reportSchema.title = $scope.reportSchema.title || $scope.modelName;
-                        $scope.titleWithSubstitutions = substituteParams($scope.reportSchema.title);
+                        substituteParams($scope.reportSchema.title)
+                            .then(function (str) {
+                                $scope.titleWithSubstitutions = str;
+                            });
                         $scope.gridOptions.enableFiltering = !!$scope.reportSchema.filter;
                         if (navScope && navScope.items) {
                             navScope.items.length = 2;
                             if ($scope.reportSchema.menu) {
                                 $scope.reportSchema.menu.forEach(function (m) {
-                                    navScope.items.push(JSON.parse(substituteParams(JSON.stringify(m))));
+                                    substituteParams(JSON.stringify(m)).then(function (str) {
+                                        navScope.items.push(JSON.parse(str));
+                                    });
                                 });
                             }
                         }
@@ -391,7 +424,7 @@ ${e.message}`);
         });
 
         // Error handling, stolen quickly from forms-angular record-handler
-        $scope.showError = function(error, alertTitle) {
+        $scope.showError = function (error, alertTitle) {
             $scope.alertTitle = alertTitle ? alertTitle : 'Error!';
             if (typeof error === 'string') {
                 $scope.errorMessage = error;
@@ -408,7 +441,7 @@ ${e.message}`);
                     $scope.errorMessage = error;
                 }
             }
-            $scope.errorHideTimer = window.setTimeout(function() {
+            $scope.errorHideTimer = window.setTimeout(function () {
                 $scope.dismissError();
                 $scope.$digest();
             }, 3500 + (1000 * ($scope.alertTitle + $scope.errorMessage).length / 50));
@@ -418,21 +451,21 @@ ${e.message}`);
             });
         };
 
-        $scope.clearTimeout = function() {
+        $scope.clearTimeout = function () {
             if ($scope.errorHideTimer) {
                 clearTimeout($scope.errorHideTimer);
                 delete $scope.errorHideTimer;
             }
         };
 
-        $scope.dismissError = function() {
+        $scope.dismissError = function () {
             $scope.clearTimeout;
             $scope.errorVisible = false;
             delete $scope.errorMessage;
             delete $scope.alertTitle;
         };
 
-        $scope.stickError = function() {
+        $scope.stickError = function () {
             clearTimeout($scope.errorHideTimer);
         };
 
