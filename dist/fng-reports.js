@@ -1,8 +1,8 @@
-/*! forms-angular 2023-10-20 */
+/*! forms-angular 2023-10-21 */
 'use strict';
 
-formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$q', '$filter', '$scope', '$http', '$location', 'CssFrameworkService', 'RoutingService',
-    function ($rootScope, $window, $q, $filter, $scope, $http, $location, CssFrameworkService, RoutingService) {
+formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$q', '$filter', '$scope', '$http', '$location', 'CssFrameworkService', 'RoutingService','uiGridConstants',
+    function ($rootScope, $window, $q, $filter, $scope, $http, $location, CssFrameworkService, RoutingService, uiGridConstants) {
         /*jshint newcap: false */
         var firstTime = true,
             pdfPlugIn = new ngGridPdfExportPlugin({inhibitButton: true}),
@@ -12,20 +12,19 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$q', '$filter
         angular.extend($scope, RoutingService.parsePathFunc()($location.$$path));
 
         $scope.reportSchema = {
-            columnDefs: []
+            columnDefs: [
+                        { name: 'dummy', field: 'dummy' },
+            ]
         };
         $scope.gridOptions = {
+            enableFiltering: false,
             data: 'report',
             columnDefs: $scope.reportSchema.columnDefs,
             showColumnMenu: true,
             enableRowHeaderSelection: false,
-            enableFiltering: false,
-            showGridFooter: false,
             reallyShowFooter: false,   // this determines whether it is actually displayed or not
             showTotals: true,
             enableColumnResizing: true,
-//        enableColumnReordering: true,
-//        jqueryUIDraggable: true,
             footerRowHeight: 65,
             multiSelect: false,
             plugins: [pdfPlugIn, csvPlugIn],
@@ -356,19 +355,25 @@ ${e.message}`);
                             firstTime = false;
 
                             $scope.$watch('reportSchema.columnDefs', function (newValue) {
-                                var columnTotals = false;
+                            //     var columnTotals = false;
                                 if (newValue) {
-                                    for (var i = 0; i < newValue.length; i++) {
-                                        if (newValue[i].totalsRow) {
-                                            columnTotals = true;
-                                        }
-                                        if (newValue[i].align) {
-                                            var alignClass = 'fng-' + newValue[i].align;
-                                            newValue[i].cellClass = newValue[i].cellClass || '';
-                                            if (newValue[i].cellClass.indexOf(alignClass) === -1) {
-                                                newValue[i].cellClass = newValue[i].cellClass + ' ' + alignClass;
+                                    $scope.gridOptions.columnDefs.length = 0;
+                                    for (const colDef of newValue) {
+                                        if (colDef.align) {
+                                            var alignClass = 'fng-' + colDef.align;
+                                            colDef.cellClass = colDef.cellClass || '';
+                                            if (colDef.cellClass.indexOf(alignClass) === -1) {
+                                                colDef.cellClass = colDef.cellClass + ' ' + alignClass;
                                             }
                                         }
+                                        if (colDef.aggregationTypeStr) {
+                                            $scope.gridOptions.showColumnFooter = true;
+                                            colDef.aggregationType = uiGridConstants.aggregationTypes[colDef.aggregationTypeStr];
+                                            colDef.aggregationHideLabel = colDef.aggregationTypeStr === 'sum';
+                                            colDef.footerCellFilter = colDef.cellFilter;
+                                            colDef.footerCellClass = colDef.cellClass;
+                                        }
+                                        $scope.gridOptions.columnDefs.push(colDef);
                                     }
                                     // Auto-upgrade from ng-grid to ui-grid
                                     newValue.forEach(function (def) {
@@ -377,11 +382,7 @@ ${e.message}`);
                                             def.width = parseInt(def.width.slice(0, -2));
                                         }
                                     });
-                                    $scope.gridOptions.columnDefs = newValue;
                                 }
-                                $scope.gridOptions.showTotals = columnTotals;
-                                $scope.gridOptions.reallyShowFooter = columnTotals;
-                                $scope.gridOptions.footerRowHeight = 55 + (columnTotals ? 10 : 0);
                             }, true);
 
                             if (!$scope.paramSchema && data.schema.params) {
