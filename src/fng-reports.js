@@ -1,7 +1,7 @@
 'use strict';
 
-formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$q', '$filter', '$scope', '$http', '$location', 'CssFrameworkService', 'RoutingService','uiGridConstants',
-    function ($rootScope, $window, $q, $filter, $scope, $http, $location, CssFrameworkService, RoutingService, uiGridConstants) {
+formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$q', '$filter', '$scope', '$http', '$location', 'CssFrameworkService', 'RoutingService',
+    function ($rootScope, $window, $q, $filter, $scope, $http, $location, CssFrameworkService, RoutingService) {
         /*jshint newcap: false */
         var firstTime = true,
             pdfPlugIn = new ngGridPdfExportPlugin({inhibitButton: true}),
