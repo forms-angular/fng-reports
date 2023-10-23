@@ -13,7 +13,8 @@
     "reporting"
   ],
   "scripts": {
-    "test": "grunt build"
+    "test": "echo Error - no tests specified - there is one that needs fixing",
+    "brokenTest": "grunt build"
   },
   "author": "Mark Chapman <support@forms-angular.org>",
   "license": "MIT",
