@@ -13,7 +13,7 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$q', '$filter
 
         $scope.reportSchema = {
             columnDefs: [
-                        { name: 'dummy', field: 'dummy' },
+                        // { name: 'dummy', field: 'dummy' },
             ]
         };
         $scope.gridOptions = {
