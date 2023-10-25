@@ -10,7 +10,7 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$q', '$filter
 
         angular.extend($scope, RoutingService.parsePathFunc()($location.$$path));
 
-        $scope.reportSchema = { columnDefs: [] };
+        $scope.reportSchema = { columnDefs: [{ name: ' ', field: ' ' },] };
         $scope.gridOptions = {
             enableFiltering: false,
             data: 'report',
