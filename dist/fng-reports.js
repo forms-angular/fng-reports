@@ -1,4 +1,4 @@
-/*! forms-angular 2023-10-25 */
+/*! forms-angular 2023-10-27 */
 'use strict';
 
 formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$q', '$filter', '$scope', '$http', '$location', 'CssFrameworkService', 'RoutingService', 'uiGridConstants',
@@ -11,7 +11,7 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$q', '$filter
 
         angular.extend($scope, RoutingService.parsePathFunc()($location.$$path));
 
-        $scope.reportSchema = { columnDefs: [{ name: 'Preparing... ', field: 'Preparing... ' },] };
+        $scope.reportSchema = {};
         $scope.gridOptions = {
             enableFiltering: false,
             data: 'report',
@@ -332,35 +332,10 @@ ${e.message}`);
                         var data = response.data;
                         $scope.report = data.report;
                         $scope.reportSchema = data.schema;
-                        $scope.reportSchema.title = $scope.reportSchema.title || $scope.modelName;
-                        substituteParams($scope.reportSchema.title)
-                            .then(function (str) {
-                                $scope.titleWithSubstitutions = str;
-                            });
-                        $scope.gridOptions.enableFiltering = !!$scope.reportSchema.filter;
-                        if (navScope && navScope.items) {
-                            navScope.items.length = 2;
-                            if ($scope.reportSchema.menu) {
-                                $scope.reportSchema.menu.forEach(function (m) {
-                                    substituteParams(JSON.stringify(m)).then(function (str) {
-                                        navScope.items.push(JSON.parse(str));
-                                    });
-                                });
-                            }
-                        }
-
-                        /*
-                        Generate link data
-                         */
-
                         if (firstTime) {
                             firstTime = false;
-
-                            $scope.$watch('reportSchema.columnDefs', function (newValue) {
-                            //     var columnTotals = false;
-                                if (newValue) {
-                                    $scope.gridOptions.columnDefs.length = 0;
-                                    for (const colDef of newValue) {
+                            if (data.schema.columnDefs && data.schema.columnDefs.length > 0) {
+                                    for (const colDef of data.schema.columnDefs) {
                                         if (colDef.align) {
                                             var alignClass = 'fng-' + colDef.align;
                                             colDef.cellClass = colDef.cellClass || '';
@@ -376,19 +351,32 @@ ${e.message}`);
                                             colDef.footerCellClass = colDef.cellClass;
                                         }
                                         $scope.gridOptions.columnDefs.push(colDef);
-                                    }
-                                    // Auto-upgrade from ng-grid to ui-grid
-                                    newValue.forEach(function (def) {
                                         // Remove px from column widths
-                                        if (def.width && typeof def.width === 'string' && def.width.indexOf('px') !== -1) {
-                                            def.width = parseInt(def.width.slice(0, -2));
+                                        if (colDef.width && typeof colDef.width === 'string' && colDef.width.indexOf('px') !== -1) {
+                                            colDef.width = parseInt(colDef.width.slice(0, -2));
                                         }
-                                    });
-                                }
-                            }, true);
+                                    }
+                            }
 
                             if (!$scope.paramSchema && data.schema.params) {
                                 setupParamsForm(data.schema.params);
+                            }
+
+                        }
+                        $scope.reportSchema.title = $scope.reportSchema.title || $scope.modelName;
+                        substituteParams($scope.reportSchema.title)
+                            .then(function (str) {
+                                $scope.titleWithSubstitutions = str;
+                            });
+                        $scope.gridOptions.enableFiltering = !!$scope.reportSchema.filter;
+                        if (navScope && navScope.items) {
+                            navScope.items.length = 2;
+                            if ($scope.reportSchema.menu) {
+                                $scope.reportSchema.menu.forEach(function (m) {
+                                    substituteParams(JSON.stringify(m)).then(function (str) {
+                                        navScope.items.push(JSON.parse(str));
+                                    });
+                                });
                             }
                         }
                     } else {
