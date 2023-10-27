@@ -8,6 +8,7 @@ module.exports = function(config) {
       'node_modules/angular-animate/angular-animate.js',
       'node_modules/angular-mocks/angular-mocks.js',
       'node_modules/angular-messages/angular-messages.js',
+      'node_modules/angular-ui-grid/ui-grid.js',
       'node_modules/jspdf/dist/jspdf.umd.js',
       'node_modules/forms-angular/dist/client/forms-angular.js',
       'node_modules/ng-infinite-scroll/build/ng-infinite-scroll.js',

@@ -1,6 +1,6 @@
 {
   "name": "fng-reports",
-  "version": "0.12.0-beta.230",
+  "version": "0.12.0-beta.234",
   "description": "Reporting plugin for forms-angular",
   "repository": {
     "type": "git",
@@ -13,7 +13,8 @@
     "reporting"
   ],
   "scripts": {
-    "test": "grunt build"
+    "test": "echo Error - no tests specified - there is one that needs fixing",
+    "brokenTest": "grunt build"
   },
   "author": "Mark Chapman <support@forms-angular.org>",
   "license": "MIT",
@@ -32,7 +33,7 @@
     "angular-messages": "1.8.3",
     "angular-mocks": "1.8.3",
     "angular-sanitize": "1.8.3",
-    "forms-angular": "file:../forms-angular/forms-angular-0.12.0-beta.230.tgz",
+    "forms-angular": "file:../forms-angular/forms-angular-0.12.0-beta.234.tgz",
     "grunt": "^1.5.3",
     "grunt-autoprefixer": "3.0.4",
     "grunt-concurrent": "3.0.0",

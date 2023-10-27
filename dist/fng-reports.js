@@ -1,7 +1,7 @@
-/*! forms-angular 2023-10-21 */
+/*! forms-angular 2023-10-25 */
 'use strict';
 
-formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$q', '$filter', '$scope', '$http', '$location', 'CssFrameworkService', 'RoutingService','uiGridConstants',
+formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$q', '$filter', '$scope', '$http', '$location', 'CssFrameworkService', 'RoutingService', 'uiGridConstants',
     function ($rootScope, $window, $q, $filter, $scope, $http, $location, CssFrameworkService, RoutingService, uiGridConstants) {
         /*jshint newcap: false */
         var firstTime = true,
@@ -11,11 +11,7 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$q', '$filter
 
         angular.extend($scope, RoutingService.parsePathFunc()($location.$$path));
 
-        $scope.reportSchema = {
-            columnDefs: [
-                        { name: 'dummy', field: 'dummy' },
-            ]
-        };
+        $scope.reportSchema = { columnDefs: [{ name: 'Preparing... ', field: 'Preparing... ' },] };
         $scope.gridOptions = {
             enableFiltering: false,
             data: 'report',
@@ -252,23 +248,29 @@ ${e.message}`);
                         let promises = [];
                         str.replace(/\|.+?\|/g, function (match) {
                             var param = match.slice(1, -1);
-                            var isParamTest = /\((.+)\)/.exec(param);
-                            if (isParamTest[1]) {
-                                const paramValue = $scope.reportSchema.params[isParamTest[1]].value;
-                                if (isParamTest.index > 0) {
-                                    // We have a title function to run
-                                    promises.push($http.get(`/api/${'organisation'}/${paramValue}/list`).then(function (response) {
-                                        if (response && response.status === 200 && response.data) {
-                                            return response.data.list;
-                                        } else {
-                                            return '';
-                                        }
-                                    }));
-                                } else {
-                                    promises.push(paramValue);
+                            // See if we have a function to run (check for brackets)
+                            var hasBrackets = /\((.+)\)/.exec(param);
+                            if (hasBrackets) {
+                                try {
+                                    const paramValue = $scope.reportSchema.params[hasBrackets[0].slice(1,-1)].value;
+                                    if (hasBrackets.index > 0) {
+                                        // We have a title function to run
+                                        promises.push($http.get(`/api/${hasBrackets[1]}/${paramValue}/list`).then(function (response) {
+                                            if (response && response.status === 200 && response.data) {
+                                                return response.data.list;
+                                            } else {
+                                                return '';
+                                            }
+                                        }));
+                                    } else {
+                                        promises.push('Error 265');
+                                    }
+                                } catch(e) {
+                                    console.error(e);
+                                    promises.push('Error 269');
                                 }
                             } else {
-                                promises.push('');
+                                promises.push($scope.reportSchema.params[param].value);
                             }
                             return match;
                         });
