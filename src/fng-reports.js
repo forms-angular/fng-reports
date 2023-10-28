@@ -357,7 +357,7 @@ ${e.message}`);
                                     }
                             }
 
-                            if (!$scope.paramSchema && data.schema.params) {
+                            if (!$scope.paramSchema && data.schema.params && $location.$$search.noinput !== "1") {
                                 setupParamsForm(data.schema.params);
                             }
 

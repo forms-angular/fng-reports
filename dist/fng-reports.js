@@ -1,4 +1,4 @@
-/*! forms-angular 2023-10-27 */
+/*! forms-angular 2023-10-28 */
 'use strict';
 
 formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$q', '$filter', '$scope', '$http', '$location', 'CssFrameworkService', 'RoutingService', 'uiGridConstants',
@@ -358,7 +358,7 @@ ${e.message}`);
                                     }
                             }
 
-                            if (!$scope.paramSchema && data.schema.params) {
+                            if (!$scope.paramSchema && data.schema.params && $location.$$search.noinput !== "1") {
                                 setupParamsForm(data.schema.params);
                             }
 
