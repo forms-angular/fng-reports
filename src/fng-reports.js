@@ -243,6 +243,13 @@ ${e.message}`);
             $scope.refreshQuery = function () {
 
                 function substituteParams(str) {
+                    function toTextValue(obj) {
+                        if (obj instanceof Date) {
+                            return obj.toISOString();
+                        } else {
+                            return obj;
+                        }
+                    }
                     return $q(function (resolve) {
                         let promises = [];
                         str.replace(/\|.+?\|/g, function (match) {
@@ -262,14 +269,14 @@ ${e.message}`);
                                             }
                                         }));
                                     } else {
-                                        promises.push('Error 265');
+                                        promises.push(Promise.resolve(toTextValue($scope.reportSchema.params[hasBrackets[1]].value)));
                                     }
                                 } catch(e) {
                                     console.error(e);
-                                    promises.push('Error 269');
+                                    promises.push('Error in fng-reports: ' + e.message);
                                 }
                             } else {
-                                promises.push($scope.reportSchema.params[param].value);
+                                promises.push(Promise.resolve(toTextValue($scope.reportSchema.params[param].value)));
                             }
                             return match;
                         });
