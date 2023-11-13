@@ -37,7 +37,7 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$q', '$filter
                                     isParamTest = /\((.+)\)/.exec(param);
                                 if (isParamTest) {
                                     var instructions = $scope.reportSchema.params[isParamTest[1]];
-                                    if (instructions) {
+                                    if (instructions && $scope.record) {
                                         $scope.param = $scope.record[isParamTest[1]];
                                         if (instructions.conversionExpression) {
                                             return $scope.$eval(instructions.conversionExpression);
@@ -243,23 +243,36 @@ ${e.message}`);
             $scope.refreshQuery = function () {
 
                 function substituteParams(str) {
-                    function toTextValue(obj) {
+                    function toTextValue(obj, conversionExpression) {
+                        let retVal;
+                        if (!(obj instanceof Date)) {
+                            if (typeof obj === 'string' && obj.match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3} \d{4}/)) {
+                                obj = new Date(obj.replace(' ', '+'));
+                            }
+                        }
                         if (obj instanceof Date) {
-                            return obj.toISOString();
+                            if (conversionExpression) {
+                                $scope.param = obj;
+                                retVal = $scope.$eval(conversionExpression);
+                            } else {
+                                retVal = obj.toISOString();
+                            }
                         } else {
                             return obj;
                         }
+                        return retVal;
                     }
                     return $q(function (resolve) {
                         let promises = [];
                         str.replace(/\|.+?\|/g, function (match) {
                             var param = match.slice(1, -1);
                             // See if we have a function to run (check for brackets)
-                            var hasBrackets = /\((.+)\)/.exec(param);
+                            var hasBrackets = /(.+)\((.+)\)/.exec(param);
                             if (hasBrackets) {
                                 try {
-                                    const paramValue = $scope.reportSchema.params[hasBrackets[0].slice(1,-1)].value;
-                                    if (hasBrackets.index > 0) {
+                                    const paramsObj = $scope.reportSchema.params[hasBrackets[2]];
+                                    const paramValue = paramsObj.value;
+                                    if (hasBrackets.length > 2) {
                                         // We have a title function to run
                                         promises.push($http.get(`/api/${hasBrackets[1]}/${paramValue}/list`).then(function (response) {
                                             if (response && response.status === 200 && response.data) {
@@ -269,14 +282,15 @@ ${e.message}`);
                                             }
                                         }));
                                     } else {
-                                        promises.push(Promise.resolve(toTextValue($scope.reportSchema.params[hasBrackets[1]].value)));
+                                        promises.push(Promise.resolve(toTextValue(paramValue, paramsObj.conversionExpression)));
                                     }
                                 } catch(e) {
                                     console.error(e);
                                     promises.push('Error in fng-reports: ' + e.message);
                                 }
                             } else {
-                                promises.push(Promise.resolve(toTextValue($scope.reportSchema.params[param].value)));
+                                const paramsObj = $scope.reportSchema.params[param];
+                                promises.push(Promise.resolve(toTextValue(paramsObj.value, paramsObj.conversionExpression)));
                             }
                             return match;
                         });
@@ -364,7 +378,7 @@ ${e.message}`);
                                     }
                             }
 
-                            if (!$scope.paramSchema && data.schema.params && $location.$$search.noinput !== "1") {
+                            if (!$scope.paramSchema && data.schema.params && $location.$$search.noinput !== '1') {
                                 setupParamsForm(data.schema.params);
                             }
 
