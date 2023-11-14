@@ -267,20 +267,26 @@ ${e.message}`);
                         str.replace(/\|.+?\|/g, function (match) {
                             var param = match.slice(1, -1);
                             // See if we have a function to run (check for brackets)
-                            var hasBrackets = /(.+)\((.+)\)/.exec(param);
+                            var hasBrackets = /(.*)\((.+)\)/.exec(param);
+                            let promise;
                             if (hasBrackets) {
                                 try {
                                     const paramsObj = $scope.reportSchema.params[hasBrackets[2]];
                                     const paramValue = paramsObj.value;
                                     if (hasBrackets.length > 2) {
-                                        // We have a title function to run
-                                        promises.push($http.get(`/api/${hasBrackets[1]}/${paramValue}/list`).then(function (response) {
-                                            if (response && response.status === 200 && response.data) {
-                                                return response.data.list;
-                                            } else {
-                                                return '';
-                                            }
-                                        }));
+                                        // We may have a title function to run
+                                        if (hasBrackets[1] !== '') {
+                                            promise = $http.get(`/api/${hasBrackets[1]}/${paramValue}/list`).then(function (response) {
+                                                if (response && response.status === 200 && response.data) {
+                                                    return response.data.list;
+                                                } else {
+                                                    return '';
+                                                }
+                                            });
+                                        }
+                                    }
+                                    if (promise) {
+                                        promises.push(promise);
                                     } else {
                                         promises.push(Promise.resolve(toTextValue(paramValue, paramsObj.conversionExpression)));
                                     }
