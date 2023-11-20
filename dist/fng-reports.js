@@ -1,4 +1,4 @@
-/*! forms-angular 2023-11-14 */
+/*! forms-angular 2023-11-20 */
 'use strict';
 
 formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$q', '$filter', '$scope', '$http', '$location', 'CssFrameworkService', 'RoutingService', 'uiGridConstants',
@@ -46,7 +46,12 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$q', '$filter
                                             return instructions.value;
                                         }
                                     } else {
-                                        return $scope.reportSchema.params[isParamTest[1]].value;
+                                        if ($scope.reportSchema.params[isParamTest[1]]) {
+                                            return $scope.reportSchema.params[isParamTest[1]].value ||'';
+                                        } else {
+                                            console.error('No value for ' + isParamTest[1]);
+                                            return 'ERR';
+                                        }
                                     }
                                 } else {
                                     return rowItem.entity[param];
@@ -297,7 +302,12 @@ ${e.message}`);
                                 }
                             } else {
                                 const paramsObj = $scope.reportSchema.params[param];
-                                promises.push(Promise.resolve(toTextValue(paramsObj.value, paramsObj.conversionExpression)));
+                                if (paramsObj) {
+                                    promises.push(Promise.resolve(toTextValue(paramsObj.value, paramsObj.conversionExpression)));
+                                } else {
+                                    console.log('Cannot find param ' + param);
+                                    promises.push(Promise.resolve('ERR'));
+                                }
                             }
                             return match;
                         });
