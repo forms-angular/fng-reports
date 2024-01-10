@@ -425,7 +425,7 @@ ${e.message}`);
                         body = 'You do not have permission to run this report (permission to GET all ' + $scope.modelName + ' records is required)';
                         title = 'Permission denied';
                     } else {
-                        body = 'The server could not process the request';
+                        body = `The server could not process the request<br />Details:<br />${error.data}`;
                         title = 'Error';
                     }
                     $scope.showError(body, title);
