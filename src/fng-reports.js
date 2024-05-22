@@ -28,35 +28,44 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$q', '$filter
                 $scope.gridOptions.plugins.forEach(function (p) {
                     p.init($scope, gridApi.grid, null);
                 });
-                gridApi.selection.on.rowSelectionChanged($scope, function afterSelectionChange(rowItem) {
+                gridApi.selection.on.rowSelectionChanged($scope, function afterSelectionChange(rowItem, event) {
                     var url = $scope.reportSchema.drilldown;
                     if (url) {
                         if (typeof url === 'string') {
-                            url = RoutingService.buildUrl(url.replace(/\|.+?\|/g, function (match) {
-                                var param = match.slice(1, -1),
-                                    isParamTest = /\((.+)\)/.exec(param);
-                                if (isParamTest) {
-                                    var instructions = $scope.reportSchema.params[isParamTest[1]];
-                                    if (instructions && $scope.record) {
-                                        $scope.param = $scope.record[isParamTest[1]];
-                                        if (instructions.conversionExpression) {
-                                            return $scope.$eval(instructions.conversionExpression);
+                            // See if we are in an A tag, in which case we don't need to do anything
+                            let inATag = event.target.tagName === 'A';
+                            let elm = event.target;
+                            do {
+                                elm = elm.parentElement;
+                                inATag = (elm.tagName === 'A');
+                            } while (elm && !inATag && elm !== rowItem);
+                            if (!inATag) {
+                                url = RoutingService.buildUrl(url.replace(/\|.+?\|/g, function (match) {
+                                    var param = match.slice(1, -1),
+                                        isParamTest = /\((.+)\)/.exec(param);
+                                    if (isParamTest) {
+                                        var instructions = $scope.reportSchema.params[isParamTest[1]];
+                                        if (instructions && $scope.record) {
+                                            $scope.param = $scope.record[isParamTest[1]];
+                                            if (instructions.conversionExpression) {
+                                                return $scope.$eval(instructions.conversionExpression);
+                                            } else {
+                                                return instructions.value;
+                                            }
                                         } else {
-                                            return instructions.value;
+                                            if ($scope.reportSchema.params[isParamTest[1]]) {
+                                                return $scope.reportSchema.params[isParamTest[1]].value || '';
+                                            } else {
+                                                console.error('No value for ' + isParamTest[1]);
+                                                return 'ERR';
+                                            }
                                         }
                                     } else {
-                                        if ($scope.reportSchema.params[isParamTest[1]]) {
-                                            return $scope.reportSchema.params[isParamTest[1]].value ||'';
-                                        } else {
-                                            console.error('No value for ' + isParamTest[1]);
-                                            return 'ERR';
-                                        }
+                                        return rowItem.entity[param];
                                     }
-                                } else {
-                                    return rowItem.entity[param];
-                                }
-                            }));
-                            window.location = url;
+                                }));
+                                window.location = url;
+                            }
                         } else {
                             console.error('Was expecting drilldown to be string but it was ' + typeof url + ' (' + url + ')'); // trying to track down Sentry 3037641567
                         }
