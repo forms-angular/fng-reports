@@ -103,7 +103,12 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$q', '$filter
                     if (['POST', 'PUT', 'PATCH'].indexOf(method) !== -1) {
                         configObj.data = {val: $event.currentTarget.getAttribute('data-data') || {}};
                     }
-                    $http(configObj);
+                    $http(configObj)
+                        .then(function (response) {
+                            if (response.status !== 200) {
+                                $scope.showError(response.statusText, 'Error');
+                            }
+                        });
                     $event.stopPropagation();
                 }
             }
