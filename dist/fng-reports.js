@@ -105,11 +105,9 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$q', '$filter
                         configObj.data = {val: $event.currentTarget.getAttribute('data-data') || {}};
                     }
                     $http(configObj)
-                        .then(function () {
-                            angular.nop();
-                        }, function (errorResponse) {
-                            if (errorResponse.status !== 200) {
-                                $scope.showError(errorResponse.data, 'Error: ' + errorResponse.statusText + ' (' + errorResponse.status + ')');
+                        .then(function (response) {
+                            if (response.status !== 200) {
+                                $scope.showError(response.statusText, 'Error');
                             }
                         });
                     $event.stopPropagation();
