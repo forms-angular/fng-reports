@@ -37,7 +37,7 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$q', '$filter
                             let elm = event.target;
                             do {
                                 elm = elm.parentElement;
-                                inATag = (elm.tagName === 'A');
+                                inATag = (elm && elm.tagName === 'A');
                             } while (elm && !inATag && elm !== rowItem);
                             if (!inATag) {
                                 url = RoutingService.buildUrl(url.replace(/\|.+?\|/g, function (match) {

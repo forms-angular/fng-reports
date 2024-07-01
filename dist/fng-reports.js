@@ -1,4 +1,4 @@
-/*! forms-angular 2024-06-21 */
+/*! forms-angular 2024-07-01 */
 'use strict';
 
 formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$q', '$filter', '$scope', '$http', '$location', 'CssFrameworkService', 'RoutingService', 'uiGridConstants',
@@ -38,7 +38,7 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$q', '$filter
                             let elm = event.target;
                             do {
                                 elm = elm.parentElement;
-                                inATag = (elm.tagName === 'A');
+                                inATag = (elm && elm.tagName === 'A');
                             } while (elm && !inATag && elm !== rowItem);
                             if (!inATag) {
                                 url = RoutingService.buildUrl(url.replace(/\|.+?\|/g, function (match) {
