@@ -1,4 +1,4 @@
-/*! forms-angular 2024-07-01 */
+/*! forms-angular 2024-07-26 */
 'use strict';
 
 formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$q', '$filter', '$scope', '$http', '$location', 'CssFrameworkService', 'RoutingService', 'uiGridConstants',
@@ -397,6 +397,9 @@ ${e.message}`);
                                         if (colDef.aggregationTypeStr) {
                                             $scope.gridOptions.showColumnFooter = true;
                                             colDef.aggregationType = uiGridConstants.aggregationTypes[colDef.aggregationTypeStr];
+                                            if (!colDef.aggregationType) {
+                                                colDef.aggregationType = function() {return eval(colDef.aggregationTypeStr)};
+                                            }
                                             colDef.aggregationHideLabel = colDef.aggregationTypeStr === 'sum';
                                             colDef.footerCellFilter = colDef.cellFilter;
                                             colDef.footerCellClass = colDef.cellClass;
