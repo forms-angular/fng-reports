@@ -409,6 +409,21 @@ ${e.message}`);
                                             colDef.width = parseInt(colDef.width.slice(0, -2));
                                         }
                                     }
+                            } else {
+                                // Need to generate columnDefs from the data, including every field (by default the grid gets upset by records with missing data)
+                                var allFields = new Set();
+                                data.report.forEach(function(row) {
+                                    for (var field in row) {
+                                        allFields.add(field);
+                                    }
+                                });
+                                data.schema.columnDefs = Array.from(allFields).map(function(field) {
+                                    {
+                                        const colDef = { name: field };
+                                        $scope.gridOptions.columnDefs.push(colDef);
+                                        return colDef;
+                                    }
+                                });
                             }
 
                             if (!$scope.paramSchema && data.schema.params && $location.$$search.noinput !== '1') {
