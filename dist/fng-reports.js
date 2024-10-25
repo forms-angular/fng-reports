@@ -1,4 +1,4 @@
-/*! forms-angular 2024-07-26 */
+/*! forms-angular 2024-10-25 */
 'use strict';
 
 formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$q', '$filter', '$scope', '$http', '$location', 'CssFrameworkService', 'RoutingService', 'uiGridConstants',
@@ -410,6 +410,21 @@ ${e.message}`);
                                             colDef.width = parseInt(colDef.width.slice(0, -2));
                                         }
                                     }
+                            } else {
+                                // Need to generate columnDefs from the data, including every field (by default the grid gets upset by records with missing data)
+                                var allFields = new Set();
+                                data.report.forEach(function(row) {
+                                    for (var field in row) {
+                                        allFields.add(field);
+                                    }
+                                });
+                                data.schema.columnDefs = Array.from(allFields).map(function(field) {
+                                    {
+                                        const colDef = { name: field };
+                                        $scope.gridOptions.columnDefs.push(colDef);
+                                        return colDef;
+                                    }
+                                });
                             }
 
                             if (!$scope.paramSchema && data.schema.params && $location.$$search.noinput !== '1') {
@@ -634,7 +649,11 @@ function ngGridCsvExportPlugin(opts) {
             col.doCSVExport = true;
           } else {
             const templateResp = self.scope.showsContent(col.colDef.cellTemplate, col.field);
-            if (templateResp === 'HTML') {
+            // Third party apps can override showContent and return a function
+            if (typeof templateResp === 'function') {
+              csvData += '"' + csvStringify(col.displayName) + '",';
+              col.doCSVExport = templateResp;
+            } else if (templateResp === 'HTML') {
               csvData += '"' + csvStringify(col.displayName) + '",';
               col.doCSVExport = function (value) {
                 value = value.replace(/<p>/g, '\n\n');
@@ -665,7 +684,7 @@ function ngGridCsvExportPlugin(opts) {
           if (col.doCSVExport) {
             let value = row.entity[col.field];
             if (typeof col.doCSVExport === 'function') {
-              value = col.doCSVExport(value);
+              value = col.doCSVExport(value, row.entity, col);
             }
             csvData += '"' + csvStringify(value, filters[col.field]) + '",';
           }
@@ -734,6 +753,12 @@ function ngGridPdfExportPlugin(options) {
             headerNames.push(col.field);
           } else {
             const templateResp = self.scope.showsContent(col.colDef.cellTemplate, col.field);
+            // Third party apps can override showContent and return a function
+            if (typeof templateResp === 'function') {
+              headers.push(col.displayName);
+              headerNames.push(col.field);
+              transformers[col.field] = templateResp;
+            } else
             if (templateResp === 'HTML') {
               headers.push(col.displayName);
               headerNames.push(col.field);
@@ -769,7 +794,7 @@ function ngGridPdfExportPlugin(options) {
             val = filters[h].filter(val, filters[h].filterParam);
           }
           if (transformers[h]) {
-            val = transformers[h](val);
+            val = transformers[h](val, row.entity, h);
           }
           if (typeof val === 'string') {
             // chars > 255 cause BOM characters - see https://reallycare.freshdesk.com/a/tickets/2370

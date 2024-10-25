@@ -64,7 +64,11 @@ function ngGridCsvExportPlugin(opts) {
             col.doCSVExport = true;
           } else {
             const templateResp = self.scope.showsContent(col.colDef.cellTemplate, col.field);
-            if (templateResp === 'HTML') {
+            // Third party apps can override showContent and return a function
+            if (typeof templateResp === 'function') {
+              csvData += '"' + csvStringify(col.displayName) + '",';
+              col.doCSVExport = templateResp;
+            } else if (templateResp === 'HTML') {
               csvData += '"' + csvStringify(col.displayName) + '",';
               col.doCSVExport = function (value) {
                 value = value.replace(/<p>/g, '\n\n');
@@ -95,7 +99,7 @@ function ngGridCsvExportPlugin(opts) {
           if (col.doCSVExport) {
             let value = row.entity[col.field];
             if (typeof col.doCSVExport === 'function') {
-              value = col.doCSVExport(value);
+              value = col.doCSVExport(value, row.entity, col);
             }
             csvData += '"' + csvStringify(value, filters[col.field]) + '",';
           }
