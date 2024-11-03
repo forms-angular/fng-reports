@@ -1,4 +1,4 @@
-/*! forms-angular 2024-10-25 */
+/*! forms-angular 2024-11-03 */
 'use strict';
 
 formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$q', '$filter', '$scope', '$http', '$location', 'CssFrameworkService', 'RoutingService', 'uiGridConstants',
@@ -644,7 +644,7 @@ function ngGridCsvExportPlugin(opts) {
         if (col.field.indexOf('.') !== -1) {
           console.error(`Cannot export nested fields such as ${col.field}.  Use $project to simplify.`);
         } else {
-          if (!col.colDef.cellTemplate) {
+          if (!col.colDef?.cellTemplate) {
             csvData += '"' + csvStringify(col.displayName) + '",';
             col.doCSVExport = true;
           } else {
@@ -748,17 +748,11 @@ function ngGridPdfExportPlugin(options) {
         if (col.field.indexOf('.') !== -1) {
           console.error(`Cannot export nested fields such as ${col.field}.  Use $project to simplify.`);
         } else {
-          if (!col.colDef.cellTemplate) {
+          if (!col.colDef?.cellTemplate) {
             headers.push(col.displayName);
             headerNames.push(col.field);
           } else {
             const templateResp = self.scope.showsContent(col.colDef.cellTemplate, col.field);
-            // Third party apps can override showContent and return a function
-            if (typeof templateResp === 'function') {
-              headers.push(col.displayName);
-              headerNames.push(col.field);
-              transformers[col.field] = templateResp;
-            } else
             if (templateResp === 'HTML') {
               headers.push(col.displayName);
               headerNames.push(col.field);
@@ -779,7 +773,7 @@ function ngGridPdfExportPlugin(options) {
           }
         }
       }
-      if (col.colDef.totalsRow) {
+      if (col.colDef?.totalsRow) {
         footers[col.field] = self.grid.getTotalVal(col.field, col.filter).toString();
       }
       self.scope.extractFilter(col, filters);
@@ -794,7 +788,7 @@ function ngGridPdfExportPlugin(options) {
             val = filters[h].filter(val, filters[h].filterParam);
           }
           if (transformers[h]) {
-            val = transformers[h](val, row.entity, h);
+            val = transformers[h](val);
           }
           if (typeof val === 'string') {
             // chars > 255 cause BOM characters - see https://reallycare.freshdesk.com/a/tickets/2370
