@@ -44,12 +44,12 @@ function ngGridPdfExportPlugin(options) {
         transformers = {};
 
 
-    angular.forEach(self.grid.columns, function (col, index) {
+    angular.forEach(self.grid.columns, function (col) {
       if (col.visible) {
         if (col.field.indexOf('.') !== -1) {
           console.error(`Cannot export nested fields such as ${col.field}.  Use $project to simplify.`);
         } else {
-          if (!col.colDef?.cellTemplate) {
+          if (!col.colDef || !col.colDef.cellTemplate) {
             headers.push(col.displayName);
             headerNames.push(col.field);
           } else {
@@ -74,7 +74,7 @@ function ngGridPdfExportPlugin(options) {
           }
         }
       }
-      if (col.colDef?.totalsRow) {
+      if (col.colDef && col.colDef.totalsRow) {
         footers[col.field] = self.grid.getTotalVal(col.field, col.filter).toString();
       }
       self.scope.extractFilter(col, filters);
