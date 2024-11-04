@@ -644,7 +644,7 @@ function ngGridCsvExportPlugin(opts) {
         if (col.field.indexOf('.') !== -1) {
           console.error(`Cannot export nested fields such as ${col.field}.  Use $project to simplify.`);
         } else {
-          if (!col.colDef?.cellTemplate) {
+          if (!col.colDef || !col.colDef.cellTemplate) {
             csvData += '"' + csvStringify(col.displayName) + '",';
             col.doCSVExport = true;
           } else {
