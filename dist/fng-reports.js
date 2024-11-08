@@ -1,4 +1,4 @@
-/*! forms-angular 2024-11-04 */
+/*! forms-angular 2024-11-08 */
 'use strict';
 
 formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$q', '$filter', '$scope', '$http', '$location', 'CssFrameworkService', 'RoutingService', 'uiGridConstants',
@@ -479,8 +479,7 @@ ${e.message}`);
         };
 
         $scope.$on('$locationChangeStart', function () {
-            delete navScope.contextMenu;
-            delete navScope.items;
+            navScope.clearContextMenu();
         });
 
         // Error handling, stolen quickly from forms-angular record-handler

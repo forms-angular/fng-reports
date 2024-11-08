@@ -478,8 +478,7 @@ ${e.message}`);
         };
 
         $scope.$on('$locationChangeStart', function () {
-            delete navScope.contextMenu;
-            delete navScope.items;
+            navScope.clearContextMenu();
         });
 
         // Error handling, stolen quickly from forms-angular record-handler
