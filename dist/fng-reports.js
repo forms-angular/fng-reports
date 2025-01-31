@@ -1,4 +1,4 @@
-/*! forms-angular 2024-11-08 */
+/*! forms-angular 2025-01-31 */
 'use strict';
 
 formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$q', '$filter', '$scope', '$http', '$location', 'CssFrameworkService', 'RoutingService', 'uiGridConstants',
@@ -606,7 +606,7 @@ function ngGridCsvExportPlugin(opts) {
   }
 
   self.createCSV = function () {
-    downloadFile(self.scope.reportSchema.title + '.csv','data:text/csv;charset=UTF-8,' + encodeURIComponent(self.prepareCSV()));
+    downloadFile(self.scope.titleWithSubstitutions + '.csv','data:text/csv;charset=UTF-8,' + encodeURIComponent(self.prepareCSV()));
   };
 
   self.prepareCSV = function () {
