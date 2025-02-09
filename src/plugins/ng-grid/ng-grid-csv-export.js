@@ -22,7 +22,7 @@ function ngGridCsvExportPlugin(opts) {
   }
 
   self.createCSV = function () {
-    downloadFile(self.scope.titleWithSubstitutions + '.csv','data:text/csv;charset=UTF-8,' + encodeURIComponent(self.prepareCSV()));
+    downloadFile((self.scope.titleWithSubstitutions || self.scope.reportSchema.title) + '.csv','data:text/csv;charset=UTF-8,' + encodeURIComponent(self.prepareCSV()));
   };
 
   self.prepareCSV = function () {
