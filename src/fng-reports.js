@@ -265,8 +265,12 @@ ${e.message}`);
                     function toTextValue(obj, conversionExpression) {
                         let retVal;
                         if (!(obj instanceof Date)) {
-                            if (typeof obj === 'string' && obj.match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3} \d{4}/)) {
-                                obj = new Date(obj.replace(' ', '+'));
+                            if (typeof obj === 'string') {
+                                if (obj.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3} \d{4}$/)) {
+                                    obj = new Date(obj.replace(' ', '+'));
+                                } else if (obj.match(/^\d{13}$/)) {
+                                    obj = new Date(parseInt(obj, 10));
+                                }
                             }
                         }
                         if (obj instanceof Date) {
@@ -397,7 +401,7 @@ ${e.message}`);
                                             $scope.gridOptions.showColumnFooter = true;
                                             colDef.aggregationType = uiGridConstants.aggregationTypes[colDef.aggregationTypeStr];
                                             if (!colDef.aggregationType) {
-                                                colDef.aggregationType = function() {return eval(colDef.aggregationTypeStr)};
+                                                colDef.aggregationType = function() {return eval(colDef.aggregationTypeStr);};
                                             }
                                             colDef.aggregationHideLabel = colDef.aggregationTypeStr === 'sum';
                                             colDef.footerCellFilter = colDef.cellFilter;
