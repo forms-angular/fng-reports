@@ -101,7 +101,7 @@ function ngGridCsvExportPlugin(opts) {
             if (typeof col.doCSVExport === 'function') {
               value = col.doCSVExport(value, row.entity, col);
             }
-            csvData += '"' + csvStringify(value, filters[col.field]) + '",';
+            csvData += '"' + csvStringify(value, filters[col.displayName || col.field]) + '",';
           }
         });
         csvData = swapLastCommaForNewline(csvData);

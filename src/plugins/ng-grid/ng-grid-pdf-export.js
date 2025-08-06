@@ -36,8 +36,7 @@ function ngGridPdfExportPlugin(options) {
   };
 
   self.createPDF = function () {
-    var headers = [],
-        headerNames = [],
+    var headerInfo = [],
         footers = [],
         data = [],
         filters = {},
@@ -50,13 +49,11 @@ function ngGridPdfExportPlugin(options) {
           console.error(`Cannot export nested fields such as ${col.field}.  Use $project to simplify.`);
         } else {
           if (!col.colDef || !col.colDef.cellTemplate) {
-            headers.push(col.displayName);
-            headerNames.push(col.field);
+            headerInfo.push({d: col.displayName, f: col.field});
           } else {
             const templateResp = self.scope.showsContent(col.colDef.cellTemplate, col.field);
             if (templateResp === 'HTML') {
-              headers.push(col.displayName);
-              headerNames.push(col.field);
+              headerInfo.push({d: col.displayName, f: col.field});
               transformers[col.field] = function (value) {
                 value = value.replace(/<p>/g, '\n\n');
                 value = value.replace(/<\/p>/g, '');
@@ -68,8 +65,7 @@ function ngGridPdfExportPlugin(options) {
                 return value;
               };
             } else if (templateResp) {
-              headers.push(col.displayName);
-              headerNames.push(col.field);
+              headerInfo.push({d: col.displayName, f: col.field});
             }
           }
         }
@@ -83,13 +79,13 @@ function ngGridPdfExportPlugin(options) {
     angular.forEach(self.scope.gridApi.core.getVisibleRows(), function (row) {
       var output = [];
       if (row.visible) {
-        headerNames.forEach(function(h) {
-          var val = row.entity[h];
-          if (filters[h]) {
-            val = filters[h].filter(val, filters[h].filterParam);
+        headerInfo.forEach(function(h) {
+          var val = row.entity[h.f];
+          if (filters[h.d]) {
+            val = filters[h.d].filter(val, filters[h.d].filterParam);
           }
-          if (transformers[h]) {
-            val = transformers[h](val);
+          if (transformers[h.f]) {
+            val = transformers[h.f](val);
           }
           if (typeof val === 'string') {
             // chars > 255 cause BOM characters - see https://reallycare.freshdesk.com/a/tickets/2370
@@ -111,7 +107,7 @@ function ngGridPdfExportPlugin(options) {
     // var doc = new jsPDF('landscape', 'mm', 'a4');
     var doc = new jspdf.jsPDF('landscape', 'mm', 'a4');
     doc.autoTable({
-      head: [headers],
+      head: [headerInfo.map(h => h.d)],
       body: data
     });
 

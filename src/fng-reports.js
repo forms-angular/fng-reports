@@ -189,7 +189,7 @@ ${e.message}`);
                     }
                 }
                 var filter = angular.element(document.body).injector().get('$filter')(filterName.trim());
-                filters[col.field] = {filter: filter, filterParam: filterParam};
+                filters[col.displayName || col.field] = {filter: filter, filterParam: filterParam};
             }
         };
 
