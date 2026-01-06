@@ -25,17 +25,17 @@
     "url": "https://github.com/forms-angular/fng-reports/issues"
   },
   "dependencies": {
-    "angular-ui-grid":"^4.12.7",
+    "angular-ui-grid": "^4.12.7",
     "jquery": "^3.7.1",
-    "jspdf": "^3.0.4",
-    "jspdf-autotable": "^5.0.2"
+    "jspdf": "^4.0.0",
+    "jspdf-autotable": "5.0.7"
   },
   "devDependencies": {
     "angular": "^1.8.3",
-    "angular-animate":"^1.8.3",
-    "angular-messages":"^1.8.3",
-    "angular-mocks":"^1.8.3",
-    "angular-sanitize":"^1.8.3",
+    "angular-animate": "^1.8.3",
+    "angular-messages": "^1.8.3",
+    "angular-mocks": "^1.8.3",
+    "angular-sanitize": "^1.8.3",
     "forms-angular": "^0.12.0-beta.323",
     "grunt": "^1.6.1",
     "grunt-autoprefixer": "^3.0.4",
