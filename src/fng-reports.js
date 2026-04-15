@@ -73,7 +73,7 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$q', '$filter
                 });
             },
             appScopeProvider: {
-                http: function ($event, method, url) {
+                http: function($event, method, url) {
                     /*
                     * This allows us to make an arbitrary http request from a cell template. Example:
                     * <div class="ui-grid-cell-contents">
@@ -101,11 +101,16 @@ formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$q', '$filter
                         url: url,
                     };
                     if (['POST', 'PUT', 'PATCH'].indexOf(method) !== -1) {
-                        configObj.data = {val: $event.currentTarget.getAttribute('data-data') || {}};
+                        configObj.data = { val: $event.currentTarget.getAttribute('data-data') || {} };
                     }
                     $http(configObj)
-                        .then(function (response) {
-                            if (response.status !== 200) {
+                        .then(function(response) {
+                            let refresh = $event.currentTarget.getAttribute('data-ng-refresh');
+                            if (response.status === 200) {
+                                if (refresh) {
+                                    $scope.refreshQuery();
+                                }
+                            } else {
                                 $scope.showError(response.statusText, 'Error');
                             }
                         });
