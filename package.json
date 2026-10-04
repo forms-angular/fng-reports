@@ -31,11 +31,7 @@
     "jspdf-autotable": "5.0.7"
   },
   "devDependencies": {
-    "angular": "^1.8.3",
-    "angular-animate": "^1.8.3",
-    "angular-messages": "^1.8.3",
-    "angular-mocks": "^1.8.3",
-    "angular-sanitize": "^1.8.3",
+    "angular": "npm:@brickhouse-tech/angular-lts@^1.10.4",
     "forms-angular": "^0.12.0-beta.340",
     "grunt": "^1.6.1",
     "grunt-autoprefixer": "^3.0.4",
@@ -73,7 +69,14 @@
     "path-parse": "npm:@socketregistry/path-parse@^1",
     "safe-buffer": "npm:@socketregistry/safe-buffer@^1",
     "safer-buffer": "npm:@socketregistry/safer-buffer@^1",
-    "side-channel": "npm:@socketregistry/side-channel@^1"
+    "side-channel": "npm:@socketregistry/side-channel@^1",
+    "angular": "$angular",
+    "angular-sanitize": "npm:@brickhouse-tech/angular-lts@^1.10.4",
+    "angular-messages": "npm:@brickhouse-tech/angular-lts@^1.10.4",
+    "angular-route": "npm:@brickhouse-tech/angular-lts@^1.10.4",
+    "angular-cookies": "npm:@brickhouse-tech/angular-lts@^1.10.4",
+    "angular-mocks": "npm:@brickhouse-tech/angular-lts@^1.10.4",
+    "angular-animate": "npm:@brickhouse-tech/angular-lts@^1.10.4"
   },
   "resolutions": {
     "array-flatten": "npm:@socketregistry/array-flatten@^1",
