@@ -1,4 +1,4 @@
-/*! forms-angular 2026-04-15 */
+/*! forms-angular 2026-10-20 */
 'use strict';
 
 formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$q', '$filter', '$scope', '$http', '$location', 'CssFrameworkService', 'RoutingService', 'uiGridConstants',
@@ -813,10 +813,21 @@ function ngGridPdfExportPlugin(options) {
 
     // var doc = new jsPDF('landscape', 'mm', 'a4');
     var doc = new jspdf.jsPDF('landscape', 'mm', 'a4');
-    doc.autoTable({
+    var tableOptions = {
       head: [headerInfo.map(h => h.d)],
       body: data
-    });
+    };
+    // With many columns jspdf-autotable squeezes them so narrow that the header can fill the page, leaving no
+    // room for a single line of body text.  It then adds pages forever (Maximum call stack size exceeded).
+    // When the columns would be narrower than MIN_COL_WIDTH, give them all that width and spread them across pages.
+    var MIN_COL_WIDTH = 25;
+    var margin = 40 / doc.internal.scaleFactor;   // autotable's default margin
+    var availableWidth = doc.internal.pageSize.getWidth() - 2 * margin;
+    if (headerInfo.length * MIN_COL_WIDTH > availableWidth) {
+      tableOptions.horizontalPageBreak = true;
+      tableOptions.styles = {cellWidth: availableWidth / Math.floor(availableWidth / MIN_COL_WIDTH)};
+    }
+    doc.autoTable(tableOptions);
 
     window.open(doc.output('bloburl'));
   };
