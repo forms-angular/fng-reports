@@ -457,7 +457,7 @@ ${e.message}`);
                             }
                         }
                     } else {
-                        $scope.showError(JSON.stringify(response.data.error), 'Invalid Response Error');
+                        $scope.showError(response.data ? JSON.stringify(response.data.error) : 'The server returned no data', 'Invalid Response Error');
                         $scope.reportSchema.title = 'Error - see console log';
                     }
                 }, function (error) {

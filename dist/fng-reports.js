@@ -1,4 +1,4 @@
-/*! forms-angular 2026-10-20 */
+/*! forms-angular 2026-10-28 */
 'use strict';
 
 formsAngular.controller('AnalysisCtrl', ['$rootScope', '$window', '$q', '$filter', '$scope', '$http', '$location', 'CssFrameworkService', 'RoutingService', 'uiGridConstants',
@@ -458,7 +458,7 @@ ${e.message}`);
                             }
                         }
                     } else {
-                        $scope.showError(JSON.stringify(response.data.error), 'Invalid Response Error');
+                        $scope.showError(response.data ? JSON.stringify(response.data.error) : 'The server returned no data', 'Invalid Response Error');
                         $scope.reportSchema.title = 'Error - see console log';
                     }
                 }, function (error) {
